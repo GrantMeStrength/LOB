@@ -19,7 +19,7 @@ Use the sections below to find guidance based on where you are in your journey.
 > This is a wayfinding hub. Each section links to existing canonical topics or first-wave stub articles. Stub articles are marked **[Draft]** and contain `> [!TODO]` callouts where content requires SME validation.
 
 > [!TIP]
-> **Quick reference:** When building a WinUI 3 LOB app, apply these rules without exception:
+> **Quick reference:** When building a WinUI 3 LOB app, consider these guidelines:
 >
 > **Verified stack (as of these samples):** Windows App SDK **2.3.1** (stable), `net10.0-windows`, .NET SDK **10.0.302+**, MSBuild 18+ required (`dotnet build` recommended over Visual Studio 2022's bundled MSBuild 17.x).
 >
