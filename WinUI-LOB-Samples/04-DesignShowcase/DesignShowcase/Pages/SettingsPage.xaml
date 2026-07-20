@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DesignShowcase.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Settings" />
+
+        <StackPanel Grid.Row="1" Spacing="12">
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource OverlayCornerRadius}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        Glyph="&#xE799;" />
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Control density" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Switch between Normal and Compact spacing for all controls." />
+                    </StackPanel>
+
+                    <ToggleSwitch
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        AutomationProperties.AutomationId="DensityToggle"
+                        AutomationProperties.Name="Compact density"
+                        IsOn="{x:Bind ViewModel.IsCompact, Mode=TwoWay}"
+                        OffContent="Normal"
+                        OnContent="Compact" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Page>

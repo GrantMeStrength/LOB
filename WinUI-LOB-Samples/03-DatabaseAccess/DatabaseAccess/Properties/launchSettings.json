@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DatabaseAccess (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "DatabaseAccess (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

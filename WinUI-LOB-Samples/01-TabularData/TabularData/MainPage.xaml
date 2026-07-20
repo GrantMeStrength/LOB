@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="TabularData.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:TabularData"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:TabularData.ViewModels"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <!-- Part A: card template rendered by the ItemsView. -->
+        <DataTemplate x:Key="CustomerCardTemplate" x:DataType="vm:CustomerViewModel">
+            <ItemContainer AutomationProperties.Name="{x:Bind Name}">
+                <Border
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource ControlCornerRadius}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Name}" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Company}" />
+                        <StackPanel
+                            Margin="0,8,0,0"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                            <FontIcon FontSize="14" Glyph="&#xE707;" />
+                            <TextBlock Text="{x:Bind Region}" />
+                        </StackPanel>
+                        <Border
+                            Margin="0,8,0,0"
+                            Padding="8,2"
+                            HorizontalAlignment="Left"
+                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <TextBlock
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{x:Bind Status}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </ItemContainer>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Spacing="4">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Customers" />
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource BodyTextBlockStyle}"
+                Text="The same 20 records shown as cards and as a sortable grid." />
+        </StackPanel>
+
+        <Pivot Grid.Row="1">
+            <!-- Part A: ItemsView card collection (never ListView). -->
+            <PivotItem Header="Cards">
+                <ItemsView
+                    x:Name="CardsView"
+                    AutomationProperties.AutomationId="CustomerCardsView"
+                    IsItemInvokedEnabled="False"
+                    ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
+                    ItemTemplate="{StaticResource CustomerCardTemplate}"
+                    SelectionMode="None">
+                    <ItemsView.Layout>
+                        <UniformGridLayout
+                            MinColumnSpacing="12"
+                            MinItemWidth="260"
+                            MinRowSpacing="12" />
+                    </ItemsView.Layout>
+                </ItemsView>
+            </PivotItem>
+
+            <!-- Part B: Community Toolkit DataGrid with sortable columns. -->
+            <PivotItem Header="Grid">
+                <controls:DataGrid
+                    x:Name="CustomerGrid"
+                    AutomationProperties.AutomationId="CustomerDataGrid"
+                    AutoGenerateColumns="False"
+                    CanUserSortColumns="True"
+                    GridLinesVisibility="Horizontal"
+                    IsReadOnly="True"
+                    ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
+                    SelectionMode="Single"
+                    Sorting="CustomerGrid_Sorting">
+                    <controls:DataGrid.Columns>
+                        <controls:DataGridTextColumn
+                            Binding="{Binding Name}"
+                            Header="Name"
+                            Tag="Name" />
+                        <controls:DataGridTextColumn
+                            Binding="{Binding Company}"
+                            Header="Company"
+                            Tag="Company" />
+                        <controls:DataGridTextColumn
+                            Binding="{Binding Region}"
+                            Header="Region"
+                            Tag="Region" />
+                        <controls:DataGridTextColumn
+                            Binding="{Binding Status}"
+                            Header="Status"
+                            Tag="Status" />
+                    </controls:DataGrid.Columns>
+                </controls:DataGrid>
+            </PivotItem>
+        </Pivot>
+    </Grid>
+</Page>

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ValidatedForm (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ValidatedForm (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

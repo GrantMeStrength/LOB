@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DesignShowcase.Pages.CustomersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:DesignShowcase.Models"
+    mc:Ignorable="d">
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Customers" />
+
+        <ItemsView
+            Grid.Row="1"
+            AutomationProperties.AutomationId="CustomersList"
+            AutomationProperties.Name="Customers list"
+            ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
+            SelectionMode="Single">
+            <ItemsView.Layout>
+                <StackLayout Spacing="8" />
+            </ItemsView.Layout>
+            <ItemsView.ItemTemplate>
+                <DataTemplate x:DataType="models:Customer">
+                    <ItemContainer AutomationProperties.Name="{x:Bind Name}">
+                        <Grid
+                            Padding="16,12"
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            ColumnSpacing="16"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <PersonPicture
+                                Width="40"
+                                Height="40"
+                                Initials="{x:Bind Initials}" />
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="{x:Bind Company}" />
+                            </StackPanel>
+
+                            <Border
+                                Grid.Column="2"
+                                Padding="8,2"
+                                VerticalAlignment="Center"
+                                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource ControlCornerRadius}">
+                                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Status}" />
+                            </Border>
+                        </Grid>
+                    </ItemContainer>
+                </DataTemplate>
+            </ItemsView.ItemTemplate>
+        </ItemsView>
+    </Grid>
+</Page>

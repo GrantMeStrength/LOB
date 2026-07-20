@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TabularData (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TabularData (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

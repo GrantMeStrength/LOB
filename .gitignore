@@ -1,0 +1,45 @@
+## .NET / Visual Studio build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+ARM64/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio user-specific files
+.vs/
+*.user
+*.suo
+*.userprefs
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+## MSIX / packaging output
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+*.appxupload
+GeneratedArtifacts/
+_pkginfo.txt
+
+## Local SQLite databases
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+## NuGet
+*.nupkg
+.nuget/
+packages/
+
+## OS files
+Thumbs.db
+.DS_Store
