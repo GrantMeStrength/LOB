@@ -29,16 +29,30 @@ AI can enhance LOB apps with summarization, data extraction, classification, and
 Phi Silica is a small language model (SLM) that runs locally on Copilot+ PCs via the NPU. It requires no network and keeps data on-device.
 
 ```csharp
-using Microsoft.Windows.AI.Generative;
+using Microsoft.Windows.AI;         // AIFeatureReadyState
+using Microsoft.Windows.AI.Text;    // LanguageModel
 
-var session = await LanguageModel.CreateAsync();
-var result = await session.GenerateResponseAsync(
+// Make sure the model is present and prepared (off the UI thread).
+if (LanguageModel.GetReadyState() == AIFeatureReadyState.NotReady)
+{
+    await LanguageModel.EnsureReadyAsync();
+}
+
+using LanguageModel model = await LanguageModel.CreateAsync();
+LanguageModelResponseResult result = await model.GenerateResponseAsync(
     "Summarize this customer complaint: " + complaintText);
-string summary = result.Response;
+
+if (result.Status == LanguageModelResponseStatus.Complete)
+{
+    string summary = result.Text;
+}
 ```
 
 > [!IMPORTANT]
-> Phi Silica is only available on Copilot+ PCs (Snapdragon X, Intel Core Ultra, AMD Ryzen AI). Provide a graceful fallback for other hardware.
+> Phi Silica is only available on Copilot+ PCs (Snapdragon X, Intel Core Ultra, AMD Ryzen AI). Provide a graceful fallback for other hardware. Your package must declare the `systemAIModels` restricted capability.
+
+> [!NOTE]
+> On the **stable** Windows App SDK channel, the Phi Silica language model is a [Limited Access Feature](https://learn.microsoft.com/uwp/api/windows.applicationmodel.limitedaccessfeatures) (`com.microsoft.windows.ai.languagemodel`). Third-party packages need a Microsoft-issued unlock token bound to their package identity, or `GenerateResponseAsync` fails with *"Access is denied."* For development and testing, the [experimental channel](https://learn.microsoft.com/windows/apps/windows-app-sdk/experimental-channel) does **not** require a token. See the [API troubleshooting guide](https://learn.microsoft.com/windows/ai/apis/troubleshooting) and the runnable [Sample 05 – LocalAI](../WinUI-LOB-Samples/05-LocalAI), which demonstrates this pattern with graceful degradation when the gate blocks generation.
 
 ---
 
@@ -93,7 +107,7 @@ Use DirectML for GPU acceleration on Windows.
 
 1. **Run inference off the UI thread** — always use `async`/`await`.
 2. **Provide feedback** — show a progress ring during inference.
-3. **Handle hardware absence gracefully** — check `LanguageModel.IsAvailable()` before using Phi Silica.
+3. **Handle hardware absence gracefully** — check `LanguageModel.GetReadyState()` returns `AIFeatureReadyState.Ready` before using Phi Silica, and handle the Limited Access Feature gate on the stable channel.
 4. **Respect data privacy** — on-device models keep data local; cloud models send data to Azure (ensure compliance).
 5. **Cache results** — don't re-run inference for identical inputs.
 

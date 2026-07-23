@@ -134,6 +134,6 @@ reflect these exact values:
 - **Sample 5 – SDK pin divergence.** This machine only has .NET SDK **10.0.300-preview.0.26177.108**
   installed (not 10.0.302), so `05-LocalAI/.../global.json` pins that preview to build and run
   locally. Normalize to **10.0.302** (matching Samples 1–4) on a host that has it installed.
-- **Sample 5 – `docs/ai-for-lob-apps.md` is outdated.** It uses the old
-  `Microsoft.Windows.AI.Generative` namespace; update it to `Microsoft.Windows.AI.Text.LanguageModel`
-  per Key Finding 4.
+- **Sample 5 – `docs/ai-for-lob-apps.md` updated.** The Phi Silica section now uses the correct
+  `Microsoft.Windows.AI.Text.LanguageModel` API (was the outdated `Microsoft.Windows.AI.Generative`)
+  and documents the LAF gate / channel guidance. SME to review the wording.
