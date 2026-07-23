@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LocalAiTriage (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LocalAiTriage (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

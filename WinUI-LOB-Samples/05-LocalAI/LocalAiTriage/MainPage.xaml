@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="LocalAiTriage.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:LocalAiTriage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:LocalAiTriage.Models"
+    mc:Ignorable="d">
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Support ticket triage" />
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Style="{StaticResource BodyTextBlockStyle}"
+                Text="Summarize and categorize tickets on-device with the local Phi Silica model. No data leaves this PC." />
+        </StackPanel>
+
+        <InfoBar
+            Grid.Row="1"
+            IsClosable="False"
+            IsOpen="True"
+            Message="{x:Bind ViewModel.AiStatusMessage, Mode=OneWay}"
+            Severity="{x:Bind StatusSeverity(ViewModel.IsAiReady), Mode=OneWay}" />
+
+        <Grid Grid.Row="2" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.9*" />
+                <ColumnDefinition Width="1.1*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Ticket list  -->
+            <Border
+                Grid.Column="0"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <ProgressRing
+                        Width="36"
+                        Height="36"
+                        IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+
+                    <ItemsView
+                        x:Name="TicketsList"
+                        Padding="8"
+                        IsItemInvokedEnabled="False"
+                        ItemsSource="{x:Bind ViewModel.Tickets}"
+                        SelectionChanged="OnTicketSelectionChanged"
+                        SelectionMode="Single">
+                        <ItemsView.Layout>
+                            <StackLayout Spacing="4" />
+                        </ItemsView.Layout>
+                        <ItemsView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SupportTicket">
+                                <ItemContainer AutomationProperties.Name="{x:Bind Subject}">
+                                    <StackPanel Padding="12" Spacing="2">
+                                        <TextBlock
+                                            MaxLines="1"
+                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                            Text="{x:Bind Subject}"
+                                            TextTrimming="CharacterEllipsis" />
+                                        <TextBlock
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="{x:Bind CustomerName}" />
+                                    </StackPanel>
+                                </ItemContainer>
+                            </DataTemplate>
+                        </ItemsView.ItemTemplate>
+                    </ItemsView>
+                </Grid>
+            </Border>
+
+            <!--  Detail + AI triage  -->
+            <ScrollViewer Grid.Column="1">
+                <Grid>
+                    <TextBlock
+                        x:Name="EmptyState"
+                        x:Load="{x:Bind IsNoTicketSelected(ViewModel.SelectedTicket), Mode=OneWay}"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{StaticResource BodyTextBlockStyle}"
+                        Text="Select a ticket to view its details and run AI triage." />
+
+                    <StackPanel
+                        x:Name="DetailPanel"
+                        x:Load="{x:Bind IsTicketSelected(ViewModel.SelectedTicket), Mode=OneWay}"
+                        Spacing="16">
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.SelectedTicket.Subject, Mode=OneWay}" />
+                            <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}">
+                                <Run Text="{x:Bind ViewModel.SelectedTicket.CustomerName, Mode=OneWay}" />
+                                <Run Text="&#8226;" />
+                                <Run Text="{x:Bind ViewModel.SelectedTicket.Product, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}"
+                            Text="{x:Bind ViewModel.SelectedTicket.Body, Mode=OneWay}"
+                            TextWrapping="Wrap" />
+
+                        <Button
+                            x:Name="TriageButton"
+                            AutomationProperties.Name="Run AI triage on the selected ticket"
+                            Command="{x:Bind ViewModel.TriageSelectedCommand}"
+                            Style="{StaticResource AccentButtonStyle}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <ProgressRing
+                                    Width="16"
+                                    Height="16"
+                                    IsActive="{x:Bind ViewModel.SelectedTicket.IsProcessing, Mode=OneWay}" />
+                                <TextBlock Text="Triage with local AI" />
+                            </StackPanel>
+                        </Button>
+
+                        <Border
+                            x:Name="TriageResult"
+                            x:Load="{x:Bind ViewModel.SelectedTicket.HasTriage, Mode=OneWay}"
+                            Padding="16"
+                            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        FontSize="16"
+                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                        Glyph="&#xE945;" />
+                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="AI triage (on-device)" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="Suggested category" />
+                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.SelectedTicket.Category, Mode=OneWay}" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="Summary" />
+                                    <TextBlock
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{x:Bind ViewModel.SelectedTicket.Summary, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>
