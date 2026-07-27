@@ -21,8 +21,8 @@ public sealed partial class MainWindow : Window
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
-        // The root grid hosts every page in the nav frame, so runtime theme and
-        // density changes applied to it cascade across the whole app.
+        // The root grid hosts every page in the nav frame, so runtime theme
+        // changes applied to it cascade across the whole app.
         AppearanceService.Initialize(RootGrid);
 
         NavFrame.Navigate(typeof(DashboardPage));

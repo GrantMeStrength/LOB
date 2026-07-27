@@ -9,10 +9,10 @@ solution. They are linked from the documentation at
 
 | # | Folder | Demonstrates |
 |---|--------|--------------|
-| 1 | [`WinUI-LOB-Samples/01-TabularData`](WinUI-LOB-Samples/01-TabularData) | `ItemsView` + `DataTemplate` card layout **and** a Community Toolkit `DataGrid` with sortable columns |
-| 2 | [`WinUI-LOB-Samples/02-ValidatedForm`](WinUI-LOB-Samples/02-ValidatedForm) | Input validation with `ObservableValidator` (`[Required]`, `[EmailAddress]`), per-keystroke validation, inline errors, Save gated on `HasErrors` |
+| 1 | [`WinUI-LOB-Samples/01-TabularData`](WinUI-LOB-Samples/01-TabularData) | `ItemsView` + `DataTemplate` card layout (**the recommended approach**) plus a columnar table view built from inbox controls — a stopgap while first-party WinUI grid support is in progress. The Community Toolkit `DataGrid` is unmaintained and is **not** recommended. |
+| 2 | [`WinUI-LOB-Samples/02-ValidatedForm`](WinUI-LOB-Samples/02-ValidatedForm) | Input validation as a **known WinUI gap** — WinUI has no built-in input-validation control (unlike WPF), so this sample hand-rolls a `INotifyDataErrorInfo` workaround: per-keystroke validation, inline errors, Save gated on `HasErrors` |
 | 3 | [`WinUI-LOB-Samples/03-DatabaseAccess`](WinUI-LOB-Samples/03-DatabaseAccess) | EF Core + SQLite task tracker, all data access **async and off the UI thread** |
-| 4 | [`WinUI-LOB-Samples/04-DesignShowcase`](WinUI-LOB-Samples/04-DesignShowcase) | `NavigationView`, Mica backdrop, compact/normal density toggle, light/dark theme toggle, summary card grid |
+| 4 | [`WinUI-LOB-Samples/04-DesignShowcase`](WinUI-LOB-Samples/04-DesignShowcase) | `NavigationView`, Mica backdrop, light/dark theme toggle, summary card grid |
 | 5 | [`WinUI-LOB-Samples/05-LocalAI`](WinUI-LOB-Samples/05-LocalAI) | **Local AI on a Copilot+ PC** — on-device support-ticket triage (summarize + categorize) with the Phi Silica language model via `Microsoft.Windows.AI.Text.LanguageModel`; no data leaves the device |
 
 ## Screenshots
@@ -20,7 +20,7 @@ solution. They are linked from the documentation at
 | Sample | Screenshot |
 |--------|-----------|
 | 1 — TabularData (cards) | ![Cards / ItemsView](screenshots/01-TabularData-cards.png) |
-| 1 — TabularData (DataGrid, sorted) | ![Sortable DataGrid](screenshots/01-TabularData-datagrid.png) |
+| 1 — TabularData (columnar table view) | ![Columnar table view](screenshots/01-TabularData-datagrid.png) |
 | 2 — ValidatedForm (invalid email, Save disabled) | ![Validated form](screenshots/02-ValidatedForm.png) |
 | 3 — DatabaseAccess (task tracker) | ![Task tracker](screenshots/03-DatabaseAccess.png) |
 | 4 — DesignShowcase (dashboard + Mica) | ![Design showcase](screenshots/04-DesignShowcase.png) |
@@ -30,9 +30,9 @@ solution. They are linked from the documentation at
 ## Shared conventions (all samples)
 
 - **WinUI 3 desktop**, Windows App SDK **2.3.1** (stable channel), C# only, `net10.0-windows`.
-- **MVVM** throughout — ViewModels derive from `ObservableObject` / `ObservableValidator` (`CommunityToolkit.Mvvm`).
-- **`x:Bind`** for all data binding (never `Binding` — see the DataGrid exception below).
-- **`ItemsView`** for all collection UI (never `ListView`).
+- **MVVM** throughout — ViewModels derive from `ObservableObject` (`CommunityToolkit.Mvvm`).
+- Prefer **`x:Bind`** for data binding (`Binding` still has valid uses).
+- Prefer **`ItemsView`** for new collection UI (`ListView` remains valid — e.g. the columnar table in Sample 1).
 - **`Microsoft.UI.Xaml.*`** only — no UWP `Windows.UI.Xaml.*`, `ApplicationView`, `CoreWindow`, or `CoreApplication`.
 - **System theme brushes only** — no hardcoded colors.
 - All data loading is **async**; EF Core queries and on-device model calls never run on the UI thread.
@@ -55,31 +55,20 @@ Every sample builds with **zero errors and zero warnings** and has been launched
 These are the "known unknowns" that were resolved while building the samples — the docs should
 reflect these exact values:
 
-1. **Community Toolkit DataGrid NuGet package name (Sample 1).**
-   The intuitive/guessed name `CommunityToolkit.WinUI.Controls.DataGrid` **does not exist on
-   NuGet**. The DataGrid has *not* migrated to the 8.x `CommunityToolkit.WinUI.Controls.*`
-   segmented naming. The correct, current package is:
-   ```
-   CommunityToolkit.WinUI.UI.Controls.DataGrid   (v7.1.2)
-   xmlns: using:CommunityToolkit.WinUI.UI.Controls
-   ```
-   It requires merging `ms-appx:///CommunityToolkit.WinUI.UI.Controls.DataGrid/Themes/Generic.xaml`
-   into `App.xaml`.
+1. **No first-party WinUI data grid yet (Sample 1).**
+   WinUI has no built-in data grid, and the Community Toolkit `DataGrid`
+   (`CommunityToolkit.WinUI.UI.Controls.DataGrid`) is **unmaintained (~5 years)** — it is *not*
+   recommended. First-party grid support is in progress. Until then, Sample 1 leads with the
+   recommended `ItemsView` + `DataTemplate` card layout and shows a columnar table built from
+   inbox controls as a stopgap so the gap stays visible. Docs should present cards/`ItemsView`
+   as the taught path, not a third-party grid.
 
-2. **DataGrid columns require `{Binding}`, not `{x:Bind}` (Sample 1).**
-   `DataGridBoundColumn.Binding` is typed as a classic `Binding`; the framework does not accept
-   `x:Bind` there. This is the one sanctioned exception to the "always `x:Bind`" rule — every
-   other binding in the samples uses `x:Bind`.
+2. **Compact density is deprecated (Sample 4).**
+   Compact density has been **deprecated** and can break controls, so it is *not* recommended.
+   There is no "contemporary" compact mode — the supported answer is simply the **default**
+   density. Sample 4 ships default density only (theme + backdrop toggles remain).
 
-3. **Compact-density resource dictionary URI (Sample 4).**
-   The resource dictionary that resolves at runtime on Windows App SDK 2.3.1 is:
-   ```
-   ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml
-   ```
-   Toggle density by adding/removing a `ResourceDictionary { Source = <that URI> }` on the root
-   element's `Resources.MergedDictionaries` — it must be merged **after** `XamlControlsResources`.
-
-4. **Phi Silica API namespace (Sample 5).**
+3. **Phi Silica API namespace (Sample 5).**
    The current, verified local-AI API is `Microsoft.Windows.AI.Text.LanguageModel` (with the
    readiness enum `Microsoft.Windows.AI.AIFeatureReadyState`). The older
    `Microsoft.Windows.AI.Generative.*` namespace seen in some articles — and in this repo's own
@@ -94,7 +83,7 @@ reflect these exact values:
    Requires the restricted capability `systemAIModels` (with the `rescap`/`systemai` manifest
    namespace) — the `dotnet new winui` template already declares it.
 
-5. **Phi Silica is a Limited Access Feature (LAF) on the stable channel (Sample 5).** ⚠️
+4. **Phi Silica is a Limited Access Feature (LAF) on the stable channel (Sample 5).** ⚠️
    On **stable** Windows App SDK 2.3.1, `GenerateResponseAsync` throws *"Access is denied. Limited
    Access Feature is not available: com.microsoft.windows.ai.languagemodel. Status: 3"* for a
    locally dev-registered, unsigned package — even though `GetReadyState()` returns `Ready`, the
