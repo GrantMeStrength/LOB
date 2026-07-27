@@ -14,7 +14,7 @@ ms.author: jken
 
 > [!TODO] Add screenshots showing several representative LOB app types (data-entry form, tabular data view, dashboard, navigation pane layout) demonstrating WinUI 3 Fluent Design in a business context. Images should show both light and dark themes.
 
-:::image type="content" source="images/04-DesignShowcase.png" alt-text="The WinUI 3 design showcase sample app showing a NavigationView with Mica backdrop and a dashboard pane with summary cards in light theme.":::
+:::image type="content" source="../screenshots/04-DesignShowcase.png" alt-text="The WinUI 3 design showcase sample app showing a NavigationView with Mica backdrop and a dashboard pane with summary cards in light theme.":::
 
 WinUI 3 apps look modern on Windows 11 by default — you don't need custom styling to get a Fluent Design appearance. Built-in controls automatically handle light and dark mode, system accent color, accessibility contrast ratios, and touch/keyboard/mouse input.
 
