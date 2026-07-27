@@ -98,7 +98,11 @@
 
             <PivotItem Header="Table">
                 <StackPanel Spacing="8">
-                    <!-- No first-party WinUI data grid yet; using inbox ItemsView/ListView with a columnar DataTemplate. -->
+                    <!-- No first-party WinUI data grid yet, and the Community Toolkit DataGrid is
+                         unmaintained, so we don't recommend it. First-party WinUI grid support is
+                         in progress; until then this is a stopgap: an inbox ListView with a
+                         columnar DataTemplate. Cards (ItemsView) on the other tab is the
+                         recommended layout for collections. -->
                     <Grid Padding="0,0,0,6">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="220" />
