@@ -4,7 +4,7 @@ namespace TabularData.ViewModels;
 
 /// <summary>
 /// Represents a single customer record shown in both the card
-/// <c>ItemsView</c> (Part A) and the Community Toolkit DataGrid (Part B).
+/// <c>ItemsView</c> and the columnar inbox table view.
 /// Derives from <see cref="ObservableObject"/> per the MVVM convention;
 /// the display fields are immutable once generated.
 /// </summary>

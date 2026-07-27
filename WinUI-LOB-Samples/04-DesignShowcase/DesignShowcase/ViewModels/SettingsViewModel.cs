@@ -1,19 +1,22 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DesignShowcase.Services;
+using Microsoft.UI.Xaml;
 
 namespace DesignShowcase.ViewModels;
 
 /// <summary>
-/// Backing data for the Settings page. Currently exposes the control-density
-/// toggle, which merges/unmerges the built-in Compact resource dictionary.
+/// Backing data for the Settings page.
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
-    /// <summary>
-    /// When true the app uses COMPACT control density; when false, NORMAL density.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsCompact { get; set; }
+    public SettingsViewModel()
+    {
+        IsDarkTheme = AppearanceService.CurrentTheme == ElementTheme.Dark;
+    }
 
-    partial void OnIsCompactChanged(bool value) => AppearanceService.SetCompact(value);
+    [ObservableProperty]
+    public partial bool IsDarkTheme { get; set; }
+
+    partial void OnIsDarkThemeChanged(bool value) =>
+        AppearanceService.SetTheme(value ? ElementTheme.Dark : ElementTheme.Light);
 }
