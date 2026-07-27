@@ -1,6 +1,6 @@
 ---
 title: Display tabular data in a WinUI app
-description: How to present collections of records using ItemsView and the Community Toolkit DataGrid control in a WinUI 3 line-of-business app.
+description: Choose the right WinUI 3 control for tabular data with ListView and ItemsView, including trade-offs and when to use each option.
 ms.topic: how-to
 ms.date: 07/20/2026
 author: GrantMeStrength
@@ -9,91 +9,84 @@ ms.author: jken
 
 # Display tabular data in a WinUI app
 
-Most line-of-business apps need to present rows of structured data — customer lists, inventory records, order histories. WinUI 3 provides two main paths:
-
-| Approach | When to use |
-|----------|-------------|
-| **`ItemsView`** with a custom `DataTemplate` | Card/tile layouts, grouped lists, moderate row counts |
-| **Community Toolkit `DataGrid`** | Dense tabular display with sorting, filtering, column resizing |
-
 > [!NOTE]
-> WinUI 3 does not include a first-party `DataGrid` control. Use the Community Toolkit package `CommunityToolkit.WinUI.UI.Controls.DataGrid`.
+> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
 
----
+Most line-of-business apps need to display structured, tabular data — rows and columns of records that users can scan, sort, and select. WinUI 3 doesn't ship a first-party DataGrid control today. First-party support is in progress but not yet available, so use the built-in `ListView` and `ItemsView` controls with a columnar `DataTemplate` for now.
 
-## Option 1: ItemsView with a DataTemplate
+## Overview
 
-`ItemsView` is the recommended collection control in WinUI 3 (replacing `ListView`/`GridView` for new code). It supports virtualization, item templates, and layout customization.
+:::image type="content" source="images/01-TabularData-cards.png" alt-text="The WinUI 3 tabular data sample showing a customer list in an ItemsView with card-style DataTemplates, displaying Name, Company, Region, and Status fields.":::
 
-```xml
-<ItemsView ItemsSource="{x:Bind ViewModel.Customers}">
-    <ItemsView.ItemTemplate>
-        <DataTemplate x:DataType="models:Customer">
-            <Grid Padding="12" ColumnDefinitions="*,*,Auto">
-                <TextBlock Text="{x:Bind Name}" />
-                <TextBlock Grid.Column="1" Text="{x:Bind Email}" />
-                <TextBlock Grid.Column="2" Text="{x:Bind Status}" />
-            </Grid>
-        </DataTemplate>
-    </ItemsView.ItemTemplate>
-</ItemsView>
-```
+WinUI 3 offers the following built-in options for tabular or list-style data display:
 
-> [!TODO]
-> Add guidance on `ItemsView` layout strategies (StackLayout vs LinedFlowLayout) with LOB-focused examples.
-
----
-
-## Option 2: Community Toolkit DataGrid
-
-For dense, Excel-like views with sorting and column resizing, use the Community Toolkit DataGrid:
-
-1. Install the NuGet package:
-   ```
-   dotnet add package CommunityToolkit.WinUI.UI.Controls.DataGrid --version 7.1.2
-   ```
-
-2. Add the namespace:
-   ```xml
-   xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-   ```
-
-3. Bind to your collection:
-   ```xml
-   <controls:DataGrid
-       ItemsSource="{x:Bind ViewModel.Orders}"
-       AutoGenerateColumns="True"
-       IsReadOnly="True" />
-   ```
+| Control | Source | Best for |
+|---|---|---|
+| `ListView` | WinUI 3 (inbox) | Single-column or simple multi-column lists; full template control |
+| `ItemsView` | WinUI 3 (inbox) | Modern successor to `ListView`; flexible layout via `ItemsLayout` |
 
 > [!IMPORTANT]
-> The Community Toolkit DataGrid is a community-maintained control. It does not receive the same servicing cadence as first-party WinUI controls. Test thoroughly with your data volumes.
+> WinUI 3 doesn't include a first-party DataGrid control today. First-party DataGrid support is in progress but not yet available, so use `ListView` or `ItemsView` with a columnar `DataTemplate` for tabular data for now.
 
----
+> [!TODO] SME review: update this article when first-party WinUI DataGrid support ships. Until then, keep the guidance on `ListView`/`ItemsView`.
 
-## Performance considerations
+## When to use each option
 
-- Use `ObservableCollection<T>` for live updates; for static snapshots, `List<T>` is sufficient.
-- Virtualization is automatic in `ItemsView`. For DataGrid, ensure `MaxHeight` is constrained.
-- For very large datasets (10K+ rows), consider server-side pagination.
+### ListView and ItemsView
 
-> [!TODO]
-> Add benchmark guidance: ItemsView vs DataGrid render time for 1K / 10K / 100K rows.
+`ListView` and `ItemsView` are the built-in WinUI 3 controls for displaying collections of items. They are appropriate when:
 
----
+- Your data has a natural list or card shape (not strict row-column tabular data).
+- You need full control over item templates, including heterogeneous row heights or custom layouts.
+- Column alignment is not required (or can be achieved with a custom `DataTemplate` using a `Grid`).
 
-## Screenshot: Cards layout with ItemsView
+`ItemsView` is the recommended control for new code. It supports flexible layouts via the `ItemsLayout` property and is the direction of active WinUI investment.
 
-:::image type="content" source="images/01-TabularData-cards.png" alt-text="Screenshot of a WinUI app showing customer records in a card layout using ItemsView.":::
+> [!TODO] SME validation: confirm that `ItemsView` is the recommended successor to `ListView` for new WinUI 3 apps as of the current stable Windows App SDK release. Confirm whether `ListView` is in maintenance mode or still actively developed.
 
-## Screenshot: DataGrid with dense rows
+See [List views and grid views](https://learn.microsoft.com/windows/apps/develop/ui/controls/listview-and-gridview) for usage guidance.
 
-:::image type="content" source="images/01-TabularData-datagrid.png" alt-text="Screenshot of a WinUI app showing an order list in a Community Toolkit DataGrid.":::
+## What you'll build
 
----
+> [!TODO] Describe the sample app scenario (for example: an employee directory with sortable columns, a product catalog with inline editing, or a transaction log). Define this after the control recommendation is validated by SME.
+
+## Steps
+
+### 1. Choose your control
+
+Use the decision table in the [Overview](#overview) section to select the control that fits your data shape and interaction requirements.
+
+### 2. Prepare your data source
+
+Bind the control to an `ObservableCollection<T>` so the UI updates automatically when items are added, removed, or replaced.
+
+> [!TODO] Add a C# code example defining a simple model class and an `ObservableCollection<T>` exposed from a ViewModel. Validate with SME before publishing.
+
+### 3. Define columns
+
+> [!TODO] Add XAML examples for a `ListView` and an `ItemsView` with a multi-column `DataTemplate` using a `Grid`. Validate against the current stable Windows App SDK release.
+
+### 4. Enable sorting
+
+> [!TODO] Describe how to implement column sorting for `ListView` and `ItemsView`, which requires a `CollectionViewSource` or custom sort logic. Validate with SME.
+
+### 5. Handle selection and navigation
+
+> [!TODO] Describe how to respond to row selection (navigate to a detail view, open an edit dialog, etc.). Reference the [list/details pattern](https://learn.microsoft.com/windows/apps/develop/ui/controls/list-details) for the detail pane approach.
+
+## Get the sample
+
+The complete tabular data sample — an `ItemsView`-based customer record list — is available on GitHub.
+
+> [!NOTE]
+> The sample repo is at [github.com/GrantMeStrength/LOB](https://github.com/GrantMeStrength/LOB). This URL may change if the repo is renamed or moved; this article will be updated when that happens.
+
+See the `01-TabularData/` folder in the repo.
 
 ## Related content
 
-- [ItemsView class](/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.controls.itemsview)
-- [Community Toolkit DataGrid](https://learn.microsoft.com/dotnet/communitytoolkit/windows/datagrid)
+- [List views and grid views](https://learn.microsoft.com/windows/apps/develop/ui/controls/listview-and-gridview)
 - [Data binding overview](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-overview)
+- [Data binding and MVVM](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-and-mvvm)
+- [List/details pattern](https://learn.microsoft.com/windows/apps/develop/ui/controls/list-details)
+- [Build a data-entry form with validation](build-validated-form.md)
