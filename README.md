@@ -67,7 +67,12 @@ reflect these exact values:
    around a third-party abstraction, Sample 2 hand-rolls validation with `INotifyDataErrorInfo`
    (BCL), surfacing inline errors and gating Save on `HasErrors`.
 
-3. **Phi Silica API namespace (Sample 5).**
+3. **Compact density is deprecated (Sample 4).**
+   Compact density has been **deprecated** and can break controls, so it is *not* recommended.
+   There is no "contemporary" compact mode — the supported answer is simply the **default**
+   density. Sample 4 ships default density only (theme + backdrop toggles remain).
+
+4. **Phi Silica API namespace (Sample 5).**
    The current, verified local-AI API is `Microsoft.Windows.AI.Text.LanguageModel` (with the
    readiness enum `Microsoft.Windows.AI.AIFeatureReadyState`). The older
    `Microsoft.Windows.AI.Generative.*` namespace seen in some articles — and in this repo's own
@@ -82,7 +87,7 @@ reflect these exact values:
    Requires the restricted capability `systemAIModels` (with the `rescap`/`systemai` manifest
    namespace) — the `dotnet new winui` template already declares it.
 
-4. **Phi Silica is a Limited Access Feature (LAF) on the stable channel (Sample 5).** ⚠️
+5. **Phi Silica is a Limited Access Feature (LAF) on the stable channel (Sample 5).** ⚠️
    On **stable** Windows App SDK 2.3.1, `GenerateResponseAsync` throws *"Access is denied. Limited
    Access Feature is not available: com.microsoft.windows.ai.languagemodel. Status: 3"* for a
    locally dev-registered, unsigned package — even though `GetReadyState()` returns `Ready`, the
