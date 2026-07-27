@@ -10,7 +10,7 @@ public static class AppearanceService
 {
     private static FrameworkElement? _root;
 
-    /// <summary>Registers the element whose theme/density is toggled at runtime.</summary>
+    /// <summary>Registers the element whose theme is toggled at runtime.</summary>
     public static void Initialize(FrameworkElement root) => _root = root;
 
     /// <summary>The current requested theme of the root element.</summary>
