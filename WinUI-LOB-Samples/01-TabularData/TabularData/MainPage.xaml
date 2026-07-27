@@ -98,13 +98,11 @@
 
             <PivotItem Header="Table">
                 <StackPanel Spacing="8">
-                    <!--
-                        The Community Toolkit DataGrid (CommunityToolkit.WinUI.UI.Controls.DataGrid)
-                        is unmaintained (~5 years) and is NOT recommended. WinUI has no first-party
-                        data grid yet; first-party grid support is in progress. Until then this tab
-                        shows a columnar table built from inbox ItemsView/ListView + a DataTemplate.
-                        The "Cards" tab (ItemsView) above is the recommended approach.
-                    -->
+                    <!-- No first-party WinUI data grid yet, and the Community Toolkit DataGrid is
+                         unmaintained, so we don't recommend it. First-party WinUI grid support is
+                         in progress; until then this is a stopgap: an inbox ListView with a
+                         columnar DataTemplate. Cards (ItemsView) on the other tab is the
+                         recommended layout for collections. -->
                     <Grid Padding="0,0,0,6">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="220" />
