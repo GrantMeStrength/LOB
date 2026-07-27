@@ -25,7 +25,7 @@ Input validation is one of the areas where WinUI 3 is less complete than WPF. Un
 
 ## What you'll build
 
-:::image type="content" source="images/02-ValidatedForm.png" alt-text="The WinUI 3 validated form sample showing a New Customer form with Name, Email, Phone, and Region fields. The Email field shows an inline validation error message. The Save button is disabled.":::
+:::image type="content" source="../screenshots/02-ValidatedForm.png" alt-text="The WinUI 3 validated form sample showing a New Customer form with Name, Email, Phone, and Region fields. The Email field shows an inline validation error message. The Save button is disabled.":::
 
 > [!TODO] Expand this description once SME has reviewed the form validation approach and confirmed the error display mechanism.
 

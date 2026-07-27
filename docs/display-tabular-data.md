@@ -16,7 +16,7 @@ Most line-of-business apps need to display structured, tabular data — rows and
 
 ## Overview
 
-:::image type="content" source="images/01-TabularData-cards.png" alt-text="The WinUI 3 tabular data sample showing a customer list in an ItemsView with card-style DataTemplates, displaying Name, Company, Region, and Status fields.":::
+:::image type="content" source="../screenshots/01-TabularData-cards.png" alt-text="The WinUI 3 tabular data sample showing a customer list in an ItemsView with card-style DataTemplates, displaying Name, Company, Region, and Status fields.":::
 
 WinUI 3 offers the following built-in options for tabular or list-style data display:
 

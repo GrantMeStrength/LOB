@@ -16,7 +16,7 @@ Line-of-business apps frequently read from and write to a database — an on-dev
 
 ## Overview
 
-:::image type="content" source="images/03-DatabaseAccess.png" alt-text="The WinUI 3 database access sample showing a task tracker app with a list of tasks loaded from SQLite via EF Core. Each task shows a title, due date, and a CheckBox for completion status.":::
+:::image type="content" source="../screenshots/03-DatabaseAccess.png" alt-text="The WinUI 3 database access sample showing a task tracker app with a list of tasks loaded from SQLite via EF Core. Each task shows a title, due date, and a CheckBox for completion status.":::
 
 | Scenario | Recommended approach |
 |---|---|
