@@ -1,6 +1,6 @@
 ---
 title: Add AI capabilities to a line-of-business WinUI app
-description: How to integrate on-device AI (Phi Silica, ONNX Runtime) and cloud AI (Azure OpenAI) into a WinUI 3 LOB app.
+description: How to integrate on-device AI (Phi Silica, ONNX Runtime) and cloud AI (Azure OpenAI) into a line-of-business WinUI 3 app.
 ms.topic: how-to
 ms.date: 07/20/2026
 author: GrantMeStrength

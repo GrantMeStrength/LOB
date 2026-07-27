@@ -1,7 +1,7 @@
 ---
 title: Design for productivity in WinUI LOB apps
-description: Design patterns for WinUI 3 line-of-business apps — compact density, navigation, theming, and accessibility.
-ms.topic: concept
+description: Design WinUI 3 line-of-business apps for productivity with guidance on theming, materials, accessibility, and responsive layouts.
+ms.topic: article
 ms.date: 07/20/2026
 author: GrantMeStrength
 ms.author: jken
@@ -9,77 +9,104 @@ ms.author: jken
 
 # Design for productivity in WinUI LOB apps
 
-LOB apps prioritize information density, keyboard navigation, and long-session comfort over consumer app aesthetics. WinUI 3 supports these needs through Fluent Design primitives with density, theme, and accessibility customization.
+> [!NOTE]
+> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
 
----
+> [!TODO] Add screenshots showing several representative LOB app types (data-entry form, tabular data view, dashboard, navigation pane layout) demonstrating WinUI 3 Fluent Design in a business context. Images should show both light and dark themes.
 
-## Compact density
+:::image type="content" source="images/04-DesignShowcase.png" alt-text="The WinUI 3 design showcase sample app showing a NavigationView with Mica backdrop and a dashboard pane with summary cards in light theme.":::
 
-WinUI 3 supports a compact resource set that reduces control padding:
+WinUI 3 apps look modern on Windows 11 by default — you don't need custom styling to get a Fluent Design appearance. Built-in controls automatically handle light and dark mode, system accent color, accessibility contrast ratios, and touch/keyboard/mouse input.
 
-```xml
-<Page.Resources>
-    <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
-</Page.Resources>
-```
+For LOB apps, the design goal is **clarity and speed**, not decoration. Users of internal business tools need to process information quickly and complete tasks accurately. This article covers the WinUI 3 design features most relevant to that goal.
 
-This reduces default row height in lists and spacing between controls — critical for data-heavy views.
+> [!TIP]
+> **Quick reference:** When styling a WinUI 3 LOB app:
+> - Use system brushes (for example, `ApplicationPageBackgroundThemeBrush`) rather than hardcoded color values
+> - Reserve `AcrylicBackdrop` for transient surfaces such as flyouts and menus
+> - Always test in both light and dark themes before shipping
 
-> [!TODO]
-> Add before/after screenshots comparing standard and compact density for a typical form.
+## Overview
 
----
+| Design area | Default behavior | LOB recommendation |
+|---|---|---|
+| Theme | Follows Windows light/dark setting | No change needed; test both modes |
+| Background material | Solid system color | Mica on title bar/nav pane; solid on content areas |
+| Accent color | Follows Windows system accent | No change needed; do not hardcode brand colors |
+| Accessibility | WCAG-compliant contrast in default themes | Test with high-contrast mode; avoid custom colors that break contrast |
+| Layout | Fixed by default | Use `Grid` + `VisualStateManager` for adaptive window widths |
 
-## Mica and theming
+## Theming and dark mode
 
-Use Mica (or Mica Alt) as the app backdrop for a modern, lightweight look that adapts to the user's desktop wallpaper:
+WinUI 3 apps automatically follow the user's Windows theme — light or dark. You get this for free when you use system brushes and the default control styles.
 
-```csharp
-// In App.xaml.cs or Window code
-var backdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
-this.SystemBackdrop = backdrop;
-```
+The most common design bug in LOB apps is hardcoded colors: a hex value that looks fine in light mode becomes invisible in dark mode. Always use named theme resources (for example, `TextFillColorPrimaryBrush`, `CardBackgroundFillColorDefaultBrush`) rather than hardcoded `#RRGGBB` values.
 
-For branding, override theme resources:
+- [Theming](https://learn.microsoft.com/windows/apps/develop/ui/theming)
 
-```xml
-<Application.Resources>
-    <ResourceDictionary>
-        <Color x:Key="SystemAccentColor">#0078D4</Color>
-    </ResourceDictionary>
-</Application.Resources>
-```
+> [!TODO] SME: confirm the recommended set of named system brushes for common LOB UI surfaces (card background, list item background, secondary text). Link to the WinUI 3 design token reference if one exists.
 
----
+## Information density
 
-## Navigation patterns
+WinUI 3 controls use comfortable padding by default — appropriate for consumer and touch-first apps. LOB apps that display dense data (transaction grids, inventory tables, scheduling views) often need to fit more information on screen.
 
-| Pattern | Best for |
-|---------|----------|
-| `NavigationView` (left pane) | Apps with 5–10 top-level sections |
-| `TabView` | Multi-document or multi-record workflows |
-| Breadcrumb + `Frame` | Deep hierarchical navigation |
+> [!IMPORTANT]
+> The compact resource dictionary (`Microsoft.UI.Xaml/DensityStyles/Compact.xaml`) is deprecated and isn't recommended. Some controls may still respond to it, but applying it app-wide can break layout and behavior in ways that are hard to predict.
 
----
+> [!TODO] SME review: recommend a current approach to information density in LOB apps (for example, targeted spacing adjustments on specific controls) now that the compact density dictionary is deprecated.
+
+## Materials: Mica and Acrylic
+
+Mica and Acrylic are translucent background materials that create visual hierarchy between the app and the desktop behind it.
+
+**Mica** samples the desktop wallpaper and applies a tinted surface based on the wallpaper color. It is best suited for the app's background window layer — typically behind a navigation pane or title bar area.
+
+**Acrylic** is a more vivid translucent effect. In LOB apps it is appropriate for transient surfaces such as flyouts, tooltips, and context menus.
+
+Because it's translucent, **Acrylic** can reduce the readability of text placed directly on top of it, so reserve it for transient surfaces rather than dense, content-heavy data areas.
+
+> [!TODO] SME review: clarify the recommended use of Mica and Acrylic behind LOB data surfaces (grids, forms, dense lists), including whether Mica as a window base layer is appropriate when opaque content sits on top.
+
+- [System backdrops (Mica and Acrylic)](https://learn.microsoft.com/windows/apps/develop/ui/system-backdrops)
+- [In-app Acrylic](https://learn.microsoft.com/windows/apps/develop/ui/in-app-acrylic)
 
 ## Accessibility
 
-- Ensure all interactive elements have `AutomationProperties.Name`.
-- Use `TabIndex` and `AccessKey` for keyboard workflows.
-- Test with Narrator and high-contrast themes.
-- Respect `UISettings.TextScaleFactor` — don't hard-code font sizes.
+WinUI 3 inbox controls are built on the UI Automation (UIA) accessibility framework and pass WCAG contrast requirements in the default light and dark themes. You get accessible controls for free as long as you:
 
----
+- Do not override default control styles with custom colors that reduce contrast.
+- Provide meaningful `AutomationProperties.Name` values on interactive controls that lack visible labels (for example, icon-only buttons).
+- Test in Windows High Contrast mode (Settings → Accessibility → Contrast themes).
 
-## Screenshot
+See [Accessibility overview](https://learn.microsoft.com/windows/apps/design/accessibility/accessibility-overview) and [Accessibility testing](https://learn.microsoft.com/windows/apps/design/accessibility/accessibility-testing).
 
-:::image type="content" source="images/04-DesignShowcase.png" alt-text="Screenshot of a WinUI LOB app using compact density, Mica backdrop, and NavigationView.":::
+## Responsive layout
 
----
+LOB apps are used on a wide range of monitor sizes and at varying window widths — from a narrow side panel to a maximized ultrawide display. Design your layout to adapt.
+
+The recommended approach is a `Grid` with proportional (`*`) column and row sizing, combined with `VisualStateManager` adaptive triggers that reorganize the layout at specific window widths.
+
+- [Responsive design](https://learn.microsoft.com/windows/apps/design/layout/responsive-design)
+
+> [!TODO] Add a brief XAML example showing a two-column LOB layout (navigation + content) that collapses to a single column below a width threshold using `AdaptiveTrigger`. Validate with SME.
+
+## Navigation patterns for LOB apps
+
+Most LOB apps use one of two navigation patterns:
+
+| Pattern | Control | Best for |
+|---|---|---|
+| Left navigation pane | `NavigationView` | Apps with 5–10 top-level sections; familiar to Windows users |
+| Tab bar | `TabView` | Apps where users work across multiple open records simultaneously |
+
+> [!TODO] SME: add guidance on choosing between `NavigationView` and `TabView` for LOB scenarios. Link to the NavigationView and TabView control guidance pages.
 
 ## Related content
 
-- [Compact sizing](https://learn.microsoft.com/windows/apps/design/style/xaml-styles#compact-sizing)
-- [Mica material](https://learn.microsoft.com/windows/apps/design/style/mica)
-- [NavigationView](https://learn.microsoft.com/windows/apps/design/controls/navigationview)
-- [Accessibility in WinUI](https://learn.microsoft.com/windows/apps/develop/accessibility)
+- [Build line-of-business apps with WinUI](index.md)
+- [Theming](https://learn.microsoft.com/windows/apps/develop/ui/theming)
+- [System backdrops (Mica and Acrylic)](https://learn.microsoft.com/windows/apps/develop/ui/system-backdrops)
+- [Responsive design](https://learn.microsoft.com/windows/apps/design/layout/responsive-design)
+- [Accessibility overview](https://learn.microsoft.com/windows/apps/design/accessibility/accessibility-overview)
+- [Display tabular data in a WinUI app](display-tabular-data.md)
+- [LOB samples repo](https://github.com/GrantMeStrength/LOB) — see `04-DesignShowcase/` for a running example of Mica and light/dark theming
