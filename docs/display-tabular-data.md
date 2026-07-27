@@ -2,7 +2,7 @@
 title: Display tabular data in a WinUI app
 description: Choose the right WinUI 3 control for tabular data with ListView and ItemsView, including trade-offs and when to use each option.
 ms.topic: how-to
-ms.date: 07/20/2026
+ms.date: 07/27/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -16,7 +16,7 @@ Most line-of-business apps need to display structured, tabular data — rows and
 
 ## Overview
 
-:::image type="content" source="../screenshots/01-TabularData-cards.png" alt-text="The WinUI 3 tabular data sample showing a customer list in an ItemsView with card-style DataTemplates, displaying Name, Company, Region, and Status fields.":::
+:::image type="content" source="images/01-TabularData-cards.png" alt-text="The WinUI 3 tabular data sample showing a customer list in an ItemsView with card-style DataTemplates, displaying Name, Company, Region, and Status fields.":::
 
 WinUI 3 offers the following built-in options for tabular or list-style data display:
 
@@ -44,7 +44,7 @@ WinUI 3 offers the following built-in options for tabular or list-style data dis
 
 > [!TODO] SME validation: confirm that `ItemsView` is the recommended successor to `ListView` for new WinUI 3 apps as of the current stable Windows App SDK release. Confirm whether `ListView` is in maintenance mode or still actively developed.
 
-See [List views and grid views](https://learn.microsoft.com/windows/apps/develop/ui/controls/listview-and-gridview) for usage guidance.
+See [List views and grid views](../../develop/ui/controls/listview-and-gridview.md) for usage guidance.
 
 ## What you'll build
 
@@ -72,21 +72,19 @@ Bind the control to an `ObservableCollection<T>` so the UI updates automatically
 
 ### 5. Handle selection and navigation
 
-> [!TODO] Describe how to respond to row selection (navigate to a detail view, open an edit dialog, etc.). Reference the [list/details pattern](https://learn.microsoft.com/windows/apps/develop/ui/controls/list-details) for the detail pane approach.
+> [!TODO] Describe how to respond to row selection (navigate to a detail view, open an edit dialog, etc.). Reference the [list/details pattern](../../develop/ui/controls/list-details.md) for the detail pane approach.
 
 ## Get the sample
 
-The complete tabular data sample — an `ItemsView`-based customer record list — is available on GitHub.
+The tabular data sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `01-TabularData/` folder.
 
 > [!NOTE]
-> The sample repo is at [github.com/GrantMeStrength/LOB](https://github.com/GrantMeStrength/LOB). This URL may change if the repo is renamed or moved; this article will be updated when that happens.
-
-See the `01-TabularData/` folder in the repo.
+> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
 
 ## Related content
 
-- [List views and grid views](https://learn.microsoft.com/windows/apps/develop/ui/controls/listview-and-gridview)
-- [Data binding overview](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-overview)
-- [Data binding and MVVM](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-and-mvvm)
-- [List/details pattern](https://learn.microsoft.com/windows/apps/develop/ui/controls/list-details)
+- [List views and grid views](../../develop/ui/controls/listview-and-gridview.md)
+- [Data binding overview](../../develop/data-binding/data-binding-overview.md)
+- [Data binding and MVVM](../../develop/data-binding/data-binding-and-mvvm.md)
+- [List/details pattern](../../develop/ui/controls/list-details.md)
 - [Build a data-entry form with validation](build-validated-form.md)

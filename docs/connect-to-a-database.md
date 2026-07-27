@@ -2,7 +2,7 @@
 title: Connect a WinUI app to a database
 description: Connect a WinUI 3 app to a database using Entity Framework Core, load data asynchronously off the UI thread, and cache data for offline use.
 ms.topic: how-to
-ms.date: 07/20/2026
+ms.date: 07/27/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -16,7 +16,7 @@ Line-of-business apps frequently read from and write to a database — an on-dev
 
 ## Overview
 
-:::image type="content" source="../screenshots/03-DatabaseAccess.png" alt-text="The WinUI 3 database access sample showing a task tracker app with a list of tasks loaded from SQLite via EF Core. Each task shows a title, due date, and a CheckBox for completion status.":::
+:::image type="content" source="images/03-DatabaseAccess.png" alt-text="The WinUI 3 database access sample showing a task tracker app with a list of tasks loaded from SQLite via EF Core. Each task shows a title, due date, and a CheckBox for completion status.":::
 
 | Scenario | Recommended approach |
 |---|---|
@@ -127,21 +127,19 @@ For apps that need to work without a network connection, a local SQLite cache ca
 
 > [!TODO] Link to the credential locker topic and any additional guidance on secrets management for WinUI 3 apps.
 
-See [Credential locker](https://learn.microsoft.com/windows/apps/develop/security/credential-locker) for storing tokens and credentials securely using the Windows Credential Manager.
+See [Credential locker](../../develop/security/credential-locker.md) for storing tokens and credentials securely using the Windows Credential Manager.
 
 ## Get the sample
 
-A complete task tracker sample — EF Core + SQLite, async data loading, and two-way bound completion state — is available on GitHub.
+The database access sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `03-DatabaseAccess/` folder.
 
 > [!NOTE]
-> The sample repo is at [github.com/GrantMeStrength/LOB](https://github.com/GrantMeStrength/LOB). This URL may change if the repo is renamed or moved; this article will be updated when that happens.
-
-See the `03-DatabaseAccess/` folder in the repo.
+> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
 
 ## Related content
 
-- [Data binding overview](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-overview)
-- [Data binding and MVVM](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-and-mvvm)
+- [Data binding overview](../../develop/data-binding/data-binding-overview.md)
+- [Data binding and MVVM](../../develop/data-binding/data-binding-and-mvvm.md)
 - [Build a data-entry form with validation](build-validated-form.md)
 - [Display tabular data in a WinUI app](display-tabular-data.md)
-- [Credential locker](https://learn.microsoft.com/windows/apps/develop/security/credential-locker)
+- [Credential locker](../../develop/security/credential-locker.md)

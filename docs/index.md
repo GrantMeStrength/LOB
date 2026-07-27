@@ -2,7 +2,7 @@
 title: Build line-of-business apps with WinUI — overview
 description: A hub for developers building enterprise line-of-business apps with WinUI 3, covering data display, forms, authentication, and deployment.
 ms.topic: overview
-ms.date: 07/20/2026
+ms.date: 07/27/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -33,8 +33,6 @@ Use the sections below to find guidance based on where you are in your journey.
 
 > [!TODO] SME review: confirm this quick-reference list and the recommended stack versions, and remove any items that aren't broadly applicable to LOB scenarios.
 
----
-
 ## Quick decision guide
 
 Use this table to choose the right approach for common LOB requirements.
@@ -54,8 +52,6 @@ Use this table to choose the right approach for common LOB requirements.
 | Send notifications | `AppNotificationManager` (works packaged and unpackaged) | `ToastNotificationManager` (requires package identity) |
 | Deploy to managed enterprise devices | MSIX packaged app | Unpackaged for scenarios requiring enterprise IT management |
 
----
-
 ## Build a new app
 
 > [!NOTE]
@@ -68,10 +64,10 @@ If you are starting a new LOB app from scratch, WinUI 3 gives you modern control
 Most LOB apps center on displaying, filtering, and editing structured data. WinUI 3 provides several options depending on your data shape and density.
 
 - [Display tabular data in a WinUI app](display-tabular-data.md) **[Draft]** — options for grid-style data presentation using `ListView` and `ItemsView`
-- [Data binding overview](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-overview) — bind UI controls to data sources using XAML and `x:Bind`
-- [Data binding in depth](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-in-depth) — converters, change notification, and collection views
-- [Data binding and MVVM](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-and-mvvm) — structuring your app with Model-View-ViewModel
-- [List views and grid views](https://learn.microsoft.com/windows/apps/develop/ui/controls/listview-and-gridview) — selecting and using `ListView` and `GridView`
+- [Data binding overview](../../develop/data-binding/data-binding-overview.md) — bind UI controls to data sources using XAML and `x:Bind`
+- [Data binding in depth](../../develop/data-binding/data-binding-in-depth.md) — converters, change notification, and collection views
+- [Data binding and MVVM](../../develop/data-binding/data-binding-and-mvvm.md) — structuring your app with Model-View-ViewModel
+- [List views and grid views](../../develop/ui/controls/listview-and-gridview.md) — selecting and using `ListView` and `GridView`
 
 ### Build forms with validation
 
@@ -81,20 +77,20 @@ LOB apps frequently require data-entry forms with input validation.
 
 > [!TODO] Link to the WinUI controls reference index once the path is confirmed.
 
-- [Controls overview](https://learn.microsoft.com/windows/apps/develop/ui/controls/index)
+- [Controls overview](../../develop/ui/controls/index.md)
 
 ### Connect to data
 
 - [Connect a WinUI app to a database](connect-to-a-database.md) **[Draft]** — use Entity Framework Core (EF Core) with SQLite or SQL Server, load data asynchronously, and cache for offline scenarios
 
-- [HTTP client](https://learn.microsoft.com/windows/apps/develop/networking/httpclient) — make HTTP calls to REST APIs and AI service endpoints
+- [HTTP client](../../develop/networking/httpclient.md) — make HTTP calls to REST APIs and AI service endpoints
 
 ### Authentication (Entra ID / MSAL)
 
 Enterprise apps typically need user sign-in via Microsoft Entra ID (formerly Azure Active Directory) using the Microsoft Authentication Library (MSAL).
 
-- [Web Account Manager (WAM)](https://learn.microsoft.com/windows/apps/develop/security/web-account-manager) — integrate OS-brokered sign-in for Microsoft accounts and Entra ID
-- [OAuth 2.0 and OpenID Connect](https://learn.microsoft.com/windows/apps/develop/security/oauth2) — protocol-level authentication patterns
+- [Web Account Manager (WAM)](../../develop/security/web-account-manager.md) — integrate OS-brokered sign-in for Microsoft accounts and Entra ID
+- [OAuth 2.0 and OpenID Connect](../../develop/security/oauth2.md) — protocol-level authentication patterns
 
 > [!TODO] Add a link to a new "Authenticate with Entra ID using MSAL in WinUI 3" how-to once it is drafted. MSAL for .NET supports WinUI 3 via the WAM broker; the specific setup steps require SME validation.
 
@@ -102,20 +98,16 @@ Enterprise apps typically need user sign-in via Microsoft Entra ID (formerly Azu
 
 WinUI 3 apps can be distributed as MSIX packages (recommended for enterprise), as packaged apps with external location, or as unpackaged executables.
 
-- [Deployment overview](https://learn.microsoft.com/windows/apps/package-and-deploy/deploy-overview) — understand the three deployment modes
-- [Choose a distribution method](https://learn.microsoft.com/windows/apps/package-and-deploy/choose-distribution-path) — decision guide for enterprise, Store, and sideload scenarios
-
----
+- [Deployment overview](../../package-and-deploy/deploy-overview.md) — understand the three deployment modes
+- [Choose a distribution method](../../package-and-deploy/choose-distribution-path.md) — decision guide for enterprise, Store, and sideload scenarios
 
 ## Modernize an existing app
 
 If you have an existing WPF or WinForms app, you can add Windows App SDK APIs incrementally — without rewriting your entire app.
 
-You can add Windows App SDK APIs incrementally to an existing WPF or WinForms app without rewriting it. See [Use the Windows App SDK in an existing project](https://learn.microsoft.com/windows/apps/windows-app-sdk/use-windows-app-sdk-in-existing-project).
+You can add Windows App SDK APIs incrementally to an existing WPF or WinForms app without rewriting it. See [Use the Windows App SDK in an existing project](../../windows-app-sdk/use-windows-app-sdk-in-existing-project.md).
 
 Key capabilities you can add to existing .NET apps with the Windows App SDK include modern notifications, app lifecycle, windowing, and push notifications. Full WinUI 3 UI requires migrating to a WinUI 3 project, but other APIs can be called from WPF, WinForms, and Win32.
-
----
 
 ## Port from WPF, WinForms, or UWP
 
@@ -123,9 +115,9 @@ If you are migrating an existing app to WinUI 3, use the following resources.
 
 ### Migrate from WPF
 
-- [WPF patterns and their WinUI 3 equivalents](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/wpf-patterns-winui3) — side-by-side pattern mapping for controls, binding, navigation, and more
-- [Migration decision guide](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/migration-decision-guide) — evaluate whether to rewrite or incrementally modernize
-- [Migration strategy overview](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/overall-migration-strategy)
+- [WPF patterns and their WinUI 3 equivalents](../../windows-app-sdk/migrate-to-windows-app-sdk/wpf-patterns-winui3.md) — side-by-side pattern mapping for controls, binding, navigation, and more
+- [Migration decision guide](../../windows-app-sdk/migrate-to-windows-app-sdk/migration-decision-guide.md) — evaluate whether to rewrite or incrementally modernize
+- [Migration strategy overview](../../windows-app-sdk/migrate-to-windows-app-sdk/overall-migration-strategy.md)
 
 ### Migrate from WinForms
 
@@ -135,11 +127,9 @@ If you are migrating an existing app to WinUI 3, use the following resources.
 
 ### Migrate from UWP
 
-- [UWP to Windows App SDK migration overview](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/migrate-to-windows-app-sdk-ovw)
-- [WinUI 3 migration guide](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/guides/winui3)
-- [API mapping table](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/api-mapping-table)
-
----
+- [UWP to Windows App SDK migration overview](../../windows-app-sdk/migrate-to-windows-app-sdk/migrate-to-windows-app-sdk-ovw.md)
+- [WinUI 3 migration guide](../../windows-app-sdk/migrate-to-windows-app-sdk/guides/winui3.md)
+- [API mapping table](../../windows-app-sdk/migrate-to-windows-app-sdk/api-mapping-table.md)
 
 ## Add AI to your app
 
@@ -149,20 +139,16 @@ AI capabilities are increasingly expected in enterprise apps. WinUI 3 apps can u
 
 > [!TODO] Add links to Phi Silica and App Content Search reference docs once canonical paths are confirmed.
 
----
-
 ## Design for productivity
 
 WinUI 3 apps look modern on Windows 11 by default — theming, dark mode, system accent color, and accessibility are handled automatically by the inbox controls. For LOB apps, the priority is clarity and speed over decoration.
 
 - [Design for productivity in WinUI LOB apps](design-for-lob.md) **[Draft]** — theming, materials (Mica/Acrylic), accessibility, responsive layout, and navigation patterns
 
----
-
 ## Related content
 
-- [Windows App SDK overview](https://learn.microsoft.com/windows/apps/windows-app-sdk/index)
-- [WinUI 3 overview](https://learn.microsoft.com/windows/apps/winui/winui3/index)
-- [Packaging and deployment overview](https://learn.microsoft.com/windows/apps/package-and-deploy/deploy-overview)
-- [Security overview](https://learn.microsoft.com/windows/apps/develop/security/index)
+- [Windows App SDK overview](../../windows-app-sdk/index.md)
+- [WinUI 3 overview](../../winui/winui3/index.md)
+- [Packaging and deployment overview](../../package-and-deploy/deploy-overview.md)
+- [Security overview](../../develop/security/index.md)
 - [LOB samples repo](https://github.com/GrantMeStrength/LOB)

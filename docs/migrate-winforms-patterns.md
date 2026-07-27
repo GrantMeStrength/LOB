@@ -1,8 +1,8 @@
 ---
 title: WinForms patterns and their WinUI 3 equivalents
 description: A pattern mapping guide for developers migrating Windows Forms apps to WinUI 3, with control, data binding, and lifecycle equivalents.
-ms.topic: article
-ms.date: 07/20/2026
+ms.topic: concept
+ms.date: 07/27/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -10,11 +10,11 @@ ms.author: jken
 # WinForms patterns and their WinUI 3 equivalents
 
 > [!NOTE]
-> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication. This article is a companion to [WPF patterns and their WinUI 3 equivalents](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/wpf-patterns-winui3).
+> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication. This article is a companion to [WPF patterns and their WinUI 3 equivalents](../../windows-app-sdk/migrate-to-windows-app-sdk/wpf-patterns-winui3.md).
 
 Windows Forms (WinForms) developers migrating to WinUI 3 will find some familiar concepts — XAML-based layout, event-driven programming, and .NET — alongside important differences in UI composition, data binding, and application lifecycle.
 
-This article maps common WinForms patterns to their WinUI 3 equivalents. Use it alongside the [Migration decision guide](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/migration-decision-guide) to understand the scope of a migration.
+This article maps common WinForms patterns to their WinUI 3 equivalents. Use it alongside the [Migration decision guide](../../windows-app-sdk/migrate-to-windows-app-sdk/migration-decision-guide.md) to understand the scope of a migration.
 
 ## Overview
 
@@ -98,7 +98,7 @@ WinForms typically wires data to the UI in code-behind — setting `TextBox.Text
 | Collection display | `DataGridView.DataSource = list;` | `<ItemsView ItemsSource="{x:Bind ViewModel.Items}" />` |
 | Change notification | `INotifyPropertyChanged` or `BindingSource.ResetBindings` | `INotifyPropertyChanged` on the ViewModel |
 
-See [Data binding overview](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-overview) and [Data binding in depth](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-in-depth).
+See [Data binding overview](../../develop/data-binding/data-binding-overview.md) and [Data binding in depth](../../develop/data-binding/data-binding-in-depth.md).
 
 ## MVVM in WinUI 3
 
@@ -106,20 +106,17 @@ WinForms apps are often written with all logic in the form's code-behind. WinUI 
 
 > [!TODO] Add a brief "before and after" comparison showing a WinForms code-behind pattern (loading a list of records and displaying them) alongside the equivalent WinUI 3 MVVM pattern (ViewModel with `ObservableCollection<T>` + `x:Bind`). Validate code examples with SME before publishing.
 
-See [Data binding and MVVM](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-and-mvvm).
+See [Data binding and MVVM](../../develop/data-binding/data-binding-and-mvvm.md).
 
 ## Get the sample
 
-A working WinForms-pattern-to-WinUI-3 migration sample is available on GitHub. The sample demonstrates a customer list migrated from a WinForms code-behind pattern to a WinUI 3 MVVM ViewModel with `ObservableCollection<T>` and `x:Bind`.
-
-> [!NOTE]
-> The sample repo is at [github.com/GrantMeStrength/LOB](https://github.com/GrantMeStrength/LOB). This URL may change if the repo is renamed or moved; this article will be updated when that happens.
+> [!TODO] There is no dedicated WinForms-migration sample folder in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) yet. Confirm with the sample owner whether a migration sample folder should be created, and link it here once it exists.
 
 ## Related content
 
-- [WPF patterns and their WinUI 3 equivalents](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/wpf-patterns-winui3)
-- [Migration decision guide](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/migration-decision-guide)
-- [Migration strategy overview](https://learn.microsoft.com/windows/apps/windows-app-sdk/migrate-to-windows-app-sdk/overall-migration-strategy)
+- [WPF patterns and their WinUI 3 equivalents](../../windows-app-sdk/migrate-to-windows-app-sdk/wpf-patterns-winui3.md)
+- [Migration decision guide](../../windows-app-sdk/migrate-to-windows-app-sdk/migration-decision-guide.md)
+- [Migration strategy overview](../../windows-app-sdk/migrate-to-windows-app-sdk/overall-migration-strategy.md)
 - [Display tabular data in a WinUI app](display-tabular-data.md)
-- [Data binding overview](https://learn.microsoft.com/windows/apps/develop/data-binding/data-binding-overview)
+- [Data binding overview](../../develop/data-binding/data-binding-overview.md)
 - [Build a data-entry form with validation](build-validated-form.md)
