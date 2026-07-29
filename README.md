@@ -19,12 +19,12 @@ solution. They are linked from the documentation at
 
 | Sample | Screenshot |
 |--------|-----------|
-| 1 — TabularData (cards) | ![Cards / ItemsView](screenshots/01-TabularData-cards.png) |
-| 2 — ValidatedForm (invalid email, Save disabled) | ![Validated form](screenshots/02-ValidatedForm.png) |
-| 3 — DatabaseAccess (task tracker) | ![Task tracker](screenshots/03-DatabaseAccess.png) |
-| 4 — DesignShowcase (dashboard + Mica) | ![Design showcase](screenshots/04-DesignShowcase.png) |
-| 5 — LocalAI (on-device triage, experimental channel) | ![Local AI triage](screenshots/05-LocalAI-experimental.png) |
-| 5 — LocalAI (graceful degradation when the LAF gate blocks generation on the stable channel) | ![Local AI blocked](screenshots/05-LocalAI-stable.png) |
+| 1 — TabularData (cards) | ![Cards / ItemsView](docs/images/01-TabularData-cards.png) |
+| 2 — ValidatedForm (invalid email, Save disabled) | ![Validated form](docs/images/02-ValidatedForm.png) |
+| 3 — DatabaseAccess (task tracker) | ![Task tracker](docs/images/03-DatabaseAccess.png) |
+| 4 — DesignShowcase (dashboard + Mica) | ![Design showcase](docs/images/04-DesignShowcase.png) |
+| 5 — LocalAI (on-device triage, experimental channel) | ![Local AI triage](docs/images/05-LocalAI-experimental.png) |
+| 5 — LocalAI (graceful degradation when the LAF gate blocks generation on the stable channel) | ![Local AI blocked](docs/images/05-LocalAI-stable.png) |
 
 ## Shared conventions (all samples)
 
