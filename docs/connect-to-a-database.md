@@ -36,7 +36,8 @@ Line-of-business apps frequently read from and write to a database — an on-dev
 Entity Framework Core is appropriate when:
 
 - You need an ORM to map C# objects to database tables without writing raw SQL.
-- You are targeting SQLite for local storage or SQL Server for networked storage.
+- You want to minimize database-specific code.
+  - EF Core supports many relational databases through a provider model, including SQL Server, SQLite, PostgreSQL, MySQL, MariaDB, Oracle, and others. This allows most application code to remain unchanged when switching database providers, although some provider-specific features may require changes.
 - You want database migrations to manage schema evolution.
 
 EF Core runs on .NET and is fully supported in WinUI 3 apps built with .NET.
