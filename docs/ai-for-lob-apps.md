@@ -129,7 +129,10 @@ Use DirectML for GPU acceleration on Windows.
 
 ## Get the sample
 
-The local AI sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `05-LocalAI/` folder.
+The local AI sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/05-LocalAI/` folder.
+
+> [!NOTE]
+> The repository screenshots for this sample show two real AI states, not light/dark variants: an experimental-channel run where generation succeeds, and a stable-channel run where the Limited Access Feature gate blocks generation and the app falls back gracefully.
 
 > [!NOTE]
 > The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.

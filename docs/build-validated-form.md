@@ -50,7 +50,7 @@ Your validating ViewModel then derives from `ObservableValidator` (in the `Commu
 
 ## Get the sample
 
-The validated form sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `02-ValidatedForm/` folder.
+The validated form sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/02-ValidatedForm/` folder.
 
 > [!NOTE]
 > The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.

@@ -116,7 +116,7 @@ Most LOB apps use one of two navigation patterns:
 
 ## Get the sample
 
-The design showcase sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `04-DesignShowcase/` folder.
+The design showcase sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/04-DesignShowcase/` folder.
 
 > [!NOTE]
 > The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
@@ -129,4 +129,4 @@ The design showcase sample is in the [LOB samples repo](https://github.com/Grant
 - [Responsive design](../../design/layout/responsive-design.md)
 - [Accessibility overview](../../design/accessibility/accessibility-overview.md)
 - [Display tabular data in a WinUI app](display-tabular-data.md)
-- [LOB samples repo](https://github.com/GrantMeStrength/LOB) — see `04-DesignShowcase/` for a running example of Mica and light/dark theming
+- [LOB samples repo](https://github.com/GrantMeStrength/LOB) — see `WinUI-LOB-Samples/04-DesignShowcase/` for a running example of Mica and light/dark theming

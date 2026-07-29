@@ -86,7 +86,7 @@ To read as a table, columns must line up from row to row. Because each item's `D
 
 ## Get the sample
 
-The tabular data sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `01-TabularData/` folder.
+The tabular data sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/01-TabularData/` folder.
 
 > [!NOTE]
 > The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.

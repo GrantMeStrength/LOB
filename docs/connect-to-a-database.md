@@ -169,7 +169,7 @@ See [Credential locker](../../develop/security/credential-locker.md) for more on
 
 ## Get the sample
 
-The database access sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `03-DatabaseAccess/` folder.
+The database access sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/03-DatabaseAccess/` folder.
 
 > [!NOTE]
 > The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
