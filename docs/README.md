@@ -6,6 +6,11 @@ https://learn.microsoft.com/windows/apps/get-started/line-of-business/
 > [!NOTE]
 > This repo intentionally keeps only a short index here to avoid drift from the Learn copy. The per-topic markdown mirror was removed.
 >
+> [!NOTE]
+> **Reviewing before publish?** The docs are in review as PR #7160. Preview the current draft (including the overview journey diagram) at:
+> https://review.learn.microsoft.com/windows/apps/get-started/line-of-business/?branch=pr-en-us-7160
+> This preview link works only while the PR is open and requires Microsoft Learn review access.
+>
 > [!TODO]
 > Confirm the final article slugs once PR #7160 is published; until then, the titles below are listed without direct links.
 
