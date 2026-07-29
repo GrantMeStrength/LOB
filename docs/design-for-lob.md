@@ -2,7 +2,7 @@
 title: Design for productivity in WinUI LOB apps
 description: Design WinUI 3 line-of-business apps for productivity with guidance on theming, materials, accessibility, and responsive layouts.
 ms.topic: concept
-ms.date: 07/27/2026
+ms.date: 07/29/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -18,7 +18,7 @@ ms.author: jken
 
 WinUI 3 apps look modern on Windows 11 by default — you don't need custom styling to get a Fluent Design appearance. Built-in controls automatically handle light and dark mode, system accent color, accessibility contrast ratios, and touch/keyboard/mouse input.
 
-For LOB apps, the design goal is **clarity and speed**, not decoration. Users of internal business tools need to process information quickly and complete tasks accurately. This article covers the WinUI 3 design features most relevant to that goal.
+LOB apps benefit from information density, efficient keyboard navigation, and comfort during long working sessions. WinUI 3 and Fluent Design let you deliver those qualities while still looking modern and polished — an efficient business tool doesn't have to look dated. This article covers the WinUI 3 design features most relevant to productivity-focused apps.
 
 > [!TIP]
 > **Quick reference:** When styling a WinUI 3 LOB app:
@@ -57,7 +57,7 @@ WinUI 3 controls use comfortable padding by default — appropriate for consumer
 
 ## Materials: Mica and Acrylic
 
-Mica and Acrylic are translucent background materials that create visual hierarchy between the app and the desktop behind it.
+Mica and Acrylic are translucent background materials. For LOB apps their value is a modern, trustworthy, low-fatigue look: a subtle sense of depth and a clear separation between chrome (navigation, title bar) and content, without the flat, dated appearance of older business tools. Used sparingly, they reinforce visual hierarchy while keeping data areas fully readable.
 
 **Mica** samples the desktop wallpaper and applies a tinted surface based on the wallpaper color. It is best suited for the app's background window layer — typically behind a navigation pane or title bar area.
 
@@ -70,13 +70,26 @@ Because it's translucent, **Acrylic** can reduce the readability of text placed 
 - [System backdrops (Mica and Acrylic)](../../develop/ui/system-backdrops.md)
 - [In-app Acrylic](../../develop/ui/in-app-acrylic.md)
 
+## Secondary windows (child and modal)
+
+LOB apps often need more than one window — a main records view plus tool windows, property inspectors, or modal prompts. WinUI 3 supports two distinct patterns:
+
+- **Modal-in-window dialogs.** Use `ContentDialog` for a modal interaction that overlays the current window (confirmations, short forms, prompts). A `ContentDialog` requires a `XamlRoot`, which you set from the hosting element or window before calling `ShowAsync()`. This is the standard WinUI pattern for blocking the current view until the user responds.
+- **Additional top-level windows.** Create another `Microsoft.UI.Xaml.Window` for a tool window, secondary document, or floating panel, and show it alongside the main window. Each `Window` has its own content tree and lifetime.
+
+> [!TODO] SME review: WinUI 3's support for a *true modal* child window (a separate `Window` that blocks its owner) is limited. Confirm the current recommended approach for owner/child window relationships and modal behavior across separate windows, and add a verified code example.
+
 ## Accessibility
 
-WinUI 3 inbox controls are built on the UI Automation (UIA) accessibility framework and pass WCAG contrast requirements in the default light and dark themes. You get accessible controls for free as long as you:
+Accessibility is critical for LOB apps: enterprise and government customers frequently require conformance with standards such as Section 508 (U.S.) and EN 301 549 (EU). WinUI 3 inbox controls are built on the UI Automation (UIA) accessibility framework and pass WCAG contrast requirements in the default light and dark themes, so you get accessible controls for free — as long as you don't undermine them.
 
-- Do not override default control styles with custom colors that reduce contrast.
-- Provide meaningful `AutomationProperties.Name` values on interactive controls that lack visible labels (for example, icon-only buttons).
-- Test in Windows High Contrast mode (Settings → Accessibility → Contrast themes).
+- **Names for interactive elements.** Provide meaningful `AutomationProperties.Name` values on controls that lack a visible text label (for example, icon-only buttons), so Narrator and other assistive technologies can announce them.
+- **Keyboard and tab order.** Ensure every interactive control is reachable by keyboard and that focus moves in a logical order. Use `TabIndex` to correct the order where the visual layout and the default order differ, and `IsTabStop` to skip non-interactive elements.
+- **Contrast and theming.** Don't override default control styles with custom colors that reduce contrast. Test in Windows High Contrast mode (Settings → Accessibility → Contrast themes) as well as light and dark themes.
+- **Focus visuals.** Keep the default focus visuals so keyboard users can see which element has focus; don't remove focus indicators for aesthetic reasons.
+- **Test with Narrator.** Walk the app end to end with Narrator to confirm that names, states, and reading order make sense.
+
+> [!TODO] Add a short, verified example demonstrating `AutomationProperties.Name` on an icon-only button and a corrected tab order, and link a full accessibility walkthrough once the sample supports it.
 
 See [Accessibility overview](../../design/accessibility/accessibility-overview.md) and [Accessibility testing](../../design/accessibility/accessibility-testing.md).
 

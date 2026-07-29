@@ -1,8 +1,8 @@
 ---
 title: Build a data-entry form with validation in WinUI 3
-description: Input validation is a current gap in WinUI 3 compared with WPF; this article tracks the state of building validated data-entry forms.
+description: Build a data-entry form in WinUI 3 with input validation using the ObservableValidator base class from the CommunityToolkit.Mvvm package.
 ms.topic: tutorial
-ms.date: 07/27/2026
+ms.date: 07/29/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -12,16 +12,15 @@ ms.author: jken
 > [!NOTE]
 > This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
 
-Data-entry forms are central to line-of-business apps. Users enter information — customer records, work orders, inventory items — and the app must validate that data before saving it. Input validation is a known gap in WinUI 3, and this article describes the current state rather than a finished pattern.
+Data-entry forms are central to line-of-business apps. Users enter information — customer records, work orders, inventory items — and the app must validate that data before saving it. In WinUI 3, the recommended approach is the `ObservableValidator` base class from the MVVM Toolkit (`CommunityToolkit.Mvvm`), which implements `INotifyDataErrorInfo` and drives validation from data-annotation attributes on your ViewModel.
 
 ## Overview
 
-Input validation is one of the areas where WinUI 3 is less complete than WPF. Unlike WPF (which provides the `Validation` class and `ErrorTemplate`) or WinForms (`ErrorProvider`), WinUI 3 has no built-in form-validation system, and there isn't a great first-party solution today.
+WinUI 3 has no built-in form-validation control like the WPF `Validation` class or the WinForms `ErrorProvider`. Instead, validation is implemented in the ViewModel and surfaced through data binding. The `ObservableValidator` base class in the MVVM Toolkit provides this: you annotate ViewModel properties with `System.ComponentModel.DataAnnotations` attributes (such as `[Required]` or `[EmailAddress]`), call `ValidateAllProperties()` or `ValidateProperty()`, and read validation errors through `GetErrors()` and `HasErrors`.
 
-> [!IMPORTANT]
-> There is currently no recommended first-party validation framework for WinUI 3 data-entry forms. Validation has to be implemented manually in your ViewModel — for example, with the `INotifyDataErrorInfo` interface from the base class library — and wired into the UI by hand. This article is a placeholder pending a validated, supported approach.
+`CommunityToolkit.Mvvm` (the MVVM Toolkit) is a live, Microsoft-maintained NuGet package. It is distinct from the unmaintained Community Toolkit `DataGrid` control and is the current recommended MVVM library for WinUI apps.
 
-> [!TODO] SME review: decide whether to publish form-validation guidance for WinUI 3 given the current gap, or to hold this article until a supported first-party solution exists. Do not recommend Community Toolkit or other third-party validation packages as the primary approach.
+> [!TODO] SME review: confirm the recommended validation pattern (attribute-based `ObservableValidator` vs. a manual `INotifyDataErrorInfo` implementation) and the error-display approach before this article is published.
 
 ## What you'll build
 
@@ -33,10 +32,21 @@ Input validation is one of the areas where WinUI 3 is less complete than WPF. Un
 
 - Windows App SDK (stable channel) installed
 - A WinUI 3 project created from the "Blank App, Packaged (WinUI 3 in Desktop)" template or equivalent
+- The `CommunityToolkit.Mvvm` NuGet package (namespace `CommunityToolkit.Mvvm.ComponentModel`)
+
+## Add the MVVM Toolkit package
+
+Add the `CommunityToolkit.Mvvm` package to your project:
+
+```console
+dotnet add package CommunityToolkit.Mvvm
+```
+
+Your validating ViewModel then derives from `ObservableValidator` (in the `CommunityToolkit.Mvvm.ComponentModel` namespace).
 
 ## Steps
 
-> [!TODO] The step-by-step tutorial is not yet written. Because WinUI 3 has no first-party form-validation solution today, the walkthrough is on hold pending SME guidance on a supported approach. Any future steps must not be scaffolded around Community Toolkit `ObservableValidator` or other third-party validation packages.
+> [!TODO] The full step-by-step walkthrough (annotating properties, triggering validation on input, binding error messages to the UI, and enabling or disabling the Save button based on `HasErrors`) is not yet written. Author it against the `ObservableValidator` pattern above; do not scaffold around the unmaintained Community Toolkit `DataGrid` control.
 
 ## Get the sample
 
@@ -45,7 +55,7 @@ The validated form sample is in the [LOB samples repo](https://github.com/GrantM
 > [!NOTE]
 > The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
 
-> [!TODO] SME review: confirm the sample reflects a supported WinUI 3 validation approach before this article recommends it. Do not present Community Toolkit `ObservableValidator` or other third-party validation packages as the primary approach.
+> [!TODO] SME review: confirm the sample reflects the recommended `ObservableValidator` validation approach before this article links it as canonical guidance.
 
 ## Related content
 
