@@ -62,7 +62,15 @@ if (result.Status == LanguageModelResponseStatus.Complete)
 
 ### Detect readiness and provide a fallback
 
-On-device Phi Silica is only available on Copilot+ PCs with an NPU, and even there the model may need to be prepared before first use. Detect availability before you call the model, and fall back gracefully when it isn't ready.
+On-device Phi Silica is only available on Copilot+ PCs with an NPU. You can check if your app is running on a Copilot+ PC by using the `AICapabilities` class:
+
+```csharp
+using Microsoft.Windows.AI; // AICapabilities
+
+bool isCopilotPlusPC = AICapabilities.HasAICapability(AICapabilityCategory.CopilotPlusPC);
+```
+
+Even on a Copilot+ PC the model may need to be prepared before first use. Detect availability before you call the model, and fall back gracefully when it isn't ready.
 
 - **Detect.** Call `LanguageModel.GetReadyState()`. It returns an `AIFeatureReadyState` value. `Ready` means you can use the model immediately; `NotReady` means the model is supported but needs preparation — call `EnsureReadyAsync()` (off the UI thread) to download or provision it. Other states indicate the feature isn't available on the current hardware or hasn't been enabled.
 - **Use.** When the state is `Ready`, create the model and generate a response, as shown above.
