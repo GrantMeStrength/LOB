@@ -2,7 +2,7 @@
 title: Connect a WinUI app to a database
 description: Connect a WinUI 3 app to a database using Entity Framework Core, load data asynchronously off the UI thread, and cache data for offline use.
 ms.topic: how-to
-ms.date: 07/27/2026
+ms.date: 07/29/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -12,7 +12,7 @@ ms.author: jken
 > [!NOTE]
 > This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
 
-Line-of-business apps frequently read from and write to a database — an on-device SQLite database, a local SQL Server instance, or a remote database accessed through a service layer. This article describes how to connect a WinUI 3 app to a database using Entity Framework Core (EF Core), load data asynchronously so the UI thread stays responsive, and cache data locally for offline scenarios.
+Line-of-business apps frequently read from and write to a database — an on-device SQLite database, a local SQL Server instance, or a remote database accessed through a service layer. Two data-access options cover most LOB needs: SQLite for local and embedded data, and [Microsoft.Data.SqlClient](https://www.nuget.org/packages/Microsoft.Data.SqlClient) for connecting to SQL Server. This article describes how to connect a WinUI 3 app to a database using Entity Framework Core (EF Core), load data asynchronously so the UI thread stays responsive, and cache data locally for offline scenarios.
 
 ## Overview
 
@@ -21,8 +21,10 @@ Line-of-business apps frequently read from and write to a database — an on-dev
 | Scenario | Recommended approach |
 |---|---|
 | On-device data (settings, local records, offline cache) | EF Core + SQLite |
-| Corporate network database (SQL Server, Azure SQL) | EF Core + SQL Server provider, or REST API / gRPC service layer |
+| Enterprise SQL Server (on-premises or Azure SQL) | `Microsoft.Data.SqlClient`, directly or through the EF Core SQL Server provider |
 | Read-only data from an API | `HttpClient` + JSON deserialization, with optional local cache |
+
+`Microsoft.Data.SqlClient` is the current, actively maintained SQL Server client library for .NET, and it is the right choice for LOB apps that connect to enterprise SQL Server. You can use it directly or through the EF Core SQL Server provider (`Microsoft.EntityFrameworkCore.SqlServer`), which builds on it.
 
 > [!IMPORTANT]
 > For security and maintainability, enterprise apps should not connect a client desktop app directly to a shared SQL Server database using embedded credentials. Consider a REST API or gRPC service layer that the WinUI app calls over HTTPS. This article covers both direct (SQLite/local) and service-layer patterns.
@@ -125,9 +127,45 @@ For apps that need to work without a network connection, a local SQLite cache ca
 > <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
 > ```
 
-> [!TODO] Link to the credential locker topic and any additional guidance on secrets management for WinUI 3 apps.
+> [!TODO] Link to additional guidance on secrets management for WinUI 3 apps.
 
-See [Credential locker](../../develop/security/credential-locker.md) for storing tokens and credentials securely using the Windows Credential Manager.
+## Store credentials securely
+
+Instead of keeping SQL Server credentials or API tokens in a configuration file or connection string, store them in the Windows Credential Locker with `Windows.Security.Credentials.PasswordVault`. Credentials saved this way are encrypted per user and roam with the user's Microsoft account on domain-joined and Entra-joined devices.
+
+Store a credential:
+
+```csharp
+using Windows.Security.Credentials;
+
+var vault = new PasswordVault();
+vault.Add(new PasswordCredential("Contoso.LOB.Database", userName, password));
+```
+
+Retrieve it later:
+
+```csharp
+using Windows.Security.Credentials;
+
+var vault = new PasswordVault();
+try
+{
+    PasswordCredential credential = vault.Retrieve("Contoso.LOB.Database", userName);
+    credential.RetrievePassword();
+    string password = credential.Password;
+    // Use the password to build the connection at runtime.
+}
+catch (Exception)
+{
+    // No stored credential for this resource/user — prompt the user to sign in.
+}
+```
+
+If you don't know the user name in advance, enumerate stored credentials for a resource with `vault.FindAllByResource("Contoso.LOB.Database")`.
+
+> [!TODO] SME validation: confirm `PasswordVault` behavior and packaging requirements (packaged vs. unpackaged) for WinUI 3 desktop apps, and the recommended pattern for building a connection string from a retrieved credential.
+
+See [Credential locker](../../develop/security/credential-locker.md) for more on storing tokens and credentials securely using the Windows Credential Manager.
 
 ## Get the sample
 

@@ -2,7 +2,7 @@
 title: Display tabular data in a WinUI app
 description: Choose the right WinUI 3 control for tabular data with ListView and ItemsView, including trade-offs and when to use each option.
 ms.topic: how-to
-ms.date: 07/27/2026
+ms.date: 07/29/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -64,7 +64,17 @@ Bind the control to an `ObservableCollection<T>` so the UI updates automatically
 
 ### 3. Define columns
 
-> [!TODO] Add XAML examples for a `ListView` and an `ItemsView` with a multi-column `DataTemplate` using a `Grid`. Validate against the current stable Windows App SDK release.
+To read as a table, columns must line up from row to row. Because each item's `DataTemplate` is laid out independently, a `Grid` that sizes its columns with `Auto` or `*` will produce different widths per row and the data won't align. Use **fixed** column widths — ideally shared values defined once as resources — in the item template's `Grid`, and add a matching header row above the list that uses the same widths.
+
+```xml
+<!-- Shared column widths, referenced by both the header and the item template -->
+<Page.Resources>
+    <x:Double x:Key="NameColWidth">200</x:Double>
+    <x:Double x:Key="RegionColWidth">120</x:Double>
+</Page.Resources>
+```
+
+> [!TODO] Add complete, SME-validated XAML for a `ListView`/`ItemsView` item `DataTemplate` and a matching header row that reference the shared column widths, and validate against the current stable Windows App SDK release.
 
 ### 4. Enable sorting
 

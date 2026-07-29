@@ -2,7 +2,7 @@
 title: Build line-of-business apps with WinUI — overview
 description: A hub for developers building enterprise line-of-business apps with WinUI 3, covering data display, forms, authentication, and deployment.
 ms.topic: overview
-ms.date: 07/27/2026
+ms.date: 07/29/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -23,8 +23,8 @@ Use the sections below to find guidance based on where you are in your journey.
 >
 > - Use the `Microsoft.UI.Xaml.*` namespaces for XAML types. The `Windows.UI.Xaml.*` XAML namespaces belong to UWP and don't apply to a WinUI 3 desktop app. (Many other `Windows.*` Windows Runtime APIs remain usable from WinUI 3.)
 > - Prefer `ItemsView` for new list and collection UI; `ListView` remains fully supported.
-> - Bind with `x:Bind` against an `ObservableCollection<T>` rather than setting control properties in code-behind.
-> - Load data asynchronously with `async`/`await`; avoid blocking the UI thread.
+> - Bind data with `x:Bind` against an `ObservableCollection<T>`. UI-only code-behind (for example, toggling a control's visibility) is fine in MVVM.
+> - Use the async APIs for anything that does file or network I/O — HTTP requests, database queries, and AI inference — so the UI thread stays responsive. `HttpClient` exposes only asynchronous methods, so use `async`/`await` consistently.
 > - Use `WebAccountManager` (WAM) for Entra ID and Microsoft account sign-in.
 > - Store connection strings and tokens in Windows Credential Manager, not in source code.
 > - Use EF Core with SQLite for local structured data.
@@ -40,8 +40,8 @@ Use this table to choose the right approach for common LOB requirements.
 | I need to... | Recommended approach | Do not use |
 |---|---|---|
 | Display a list of records | `ItemsView` or `ListView` with a `DataTemplate` | — |
-| Display dense tabular/grid data | `ListView` or `ItemsView` with a columnar `DataTemplate` (see [Display tabular data](display-tabular-data.md)) | A first-party WinUI DataGrid isn't available yet |
-| Validate form input | `INotifyDataErrorInfo` on the ViewModel (input validation is a current WinUI gap) | WPF `Validation` class (WPF-only) |
+| Display dense tabular/grid data | `ListView` or `ItemsView` with a columnar `DataTemplate` (see [Display tabular data](display-tabular-data.md)) | — |
+| Validate form input | `ObservableValidator` from the `CommunityToolkit.Mvvm` package — see [Build a validated form](build-validated-form.md) for examples | WPF `Validation` class (WPF-only) |
 | Show a modal dialog | `ContentDialog` (requires `XamlRoot`) | — |
 | Pick a file | `FileOpenPicker` + `InitializeWithWindow` | `OpenFileDialog` (WinForms/WPF only) |
 | Sign in with Entra ID or Microsoft account | `WebAccountManager` (WAM) | Raw OAuth `HttpClient` flow |
@@ -73,7 +73,7 @@ Most LOB apps center on displaying, filtering, and editing structured data. WinU
 
 LOB apps frequently require data-entry forms with input validation.
 
-- [Build a data-entry form with validation](build-validated-form.md) **[Draft]** — approaches to input validation, and the current gaps in WinUI compared with WPF
+- [Build a data-entry form with validation](build-validated-form.md) **[Draft]** — validate input with `ObservableValidator` from the MVVM Toolkit (`CommunityToolkit.Mvvm`)
 
 > [!TODO] Link to the WinUI controls reference index once the path is confirmed.
 

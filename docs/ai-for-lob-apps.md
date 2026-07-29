@@ -2,7 +2,7 @@
 title: Add AI capabilities to a line-of-business WinUI app
 description: How to integrate on-device AI (Phi Silica, ONNX Runtime) and cloud AI (Azure OpenAI) into a line-of-business WinUI 3 app.
 ms.topic: how-to
-ms.date: 07/27/2026
+ms.date: 07/29/2026
 author: GrantMeStrength
 ms.author: jken
 ---
@@ -59,6 +59,16 @@ if (result.Status == LanguageModelResponseStatus.Complete)
 
 > [!NOTE]
 > On the **stable** Windows App SDK channel, the Phi Silica language model is a [Limited Access Feature](/uwp/api/windows.applicationmodel.limitedaccessfeatures) (`com.microsoft.windows.ai.languagemodel`). Third-party packages need a Microsoft-issued unlock token bound to their package identity, or `GenerateResponseAsync` fails with *"Access is denied."* For development and testing, the [experimental channel](/windows/apps/windows-app-sdk/experimental-channel) does **not** require a token. See the [API troubleshooting guide](/windows/ai/apis/troubleshooting) and the runnable [Sample 05 – LocalAI](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/05-LocalAI), which demonstrates this pattern with graceful degradation when the gate blocks generation.
+
+### Detect readiness and provide a fallback
+
+On-device Phi Silica is only available on Copilot+ PCs with an NPU, and even there the model may need to be prepared before first use. Detect availability before you call the model, and fall back gracefully when it isn't ready.
+
+- **Detect.** Call `LanguageModel.GetReadyState()`. It returns an `AIFeatureReadyState` value. `Ready` means you can use the model immediately; `NotReady` means the model is supported but needs preparation — call `EnsureReadyAsync()` (off the UI thread) to download or provision it. Other states indicate the feature isn't available on the current hardware or hasn't been enabled.
+- **Use.** When the state is `Ready`, create the model and generate a response, as shown above.
+- **Fall back.** When on-device generation isn't available — unsupported hardware, or the Limited Access Feature gate blocks generation on the stable channel — degrade gracefully. Disable the AI feature with a clear message, or route the request to a cloud model such as Azure OpenAI (see the next section). Choose on-device when data must stay local or you need offline/low-latency inference; choose cloud when you need a larger model or on-device isn't available.
+
+> [!TODO] SME validation: confirm the exact `AIFeatureReadyState` member names and the recommended handling for each state against the current stable Windows App SDK release, and confirm the recommended pattern for switching between on-device and cloud models at runtime.
 
 ## Cloud AI with Azure OpenAI
 
