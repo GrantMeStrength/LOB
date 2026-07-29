@@ -37,7 +37,7 @@ WinForms uses a code-first, designer-driven model where controls are defined in 
 
 The most significant differences for WinForms developers are:
 
-- **No drag-and-drop XAML designer.** WinUI 3 does not have an interactive visual designer comparable to the WinForms designer. UI is authored in XAML markup directly, often with a live preview.
+- **No drag-and-drop visual designer.** WinUI 3 does not have an interactive visual designer comparable to the WinForms designer. UI is authored in XAML markup directly, often with a live preview.
 - **Data binding replaces code-behind data wiring.** WinUI 3 uses compiled bindings (`x:Bind`) or classic bindings (`Binding`) rather than manually assigning values in event handlers.
 - **MVVM is the dominant pattern.** Business logic in WinUI 3 apps is typically separated into ViewModels, following the Model-View-ViewModel (MVVM) pattern.
 - **Application lifecycle differs.** WinUI 3 desktop apps use `App.xaml.cs` and `Window` rather than `Application.Run` and `Form`.
