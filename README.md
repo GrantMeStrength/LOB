@@ -76,7 +76,7 @@ reflect these exact values:
    The current, verified local-AI API is `Microsoft.Windows.AI.Text.LanguageModel` (with the
    readiness enum `Microsoft.Windows.AI.AIFeatureReadyState`). The older
    `Microsoft.Windows.AI.Generative.*` namespace seen in some articles — and in this repo's own
-   [`docs/ai-for-lob-apps.md`](docs/ai-for-lob-apps.md) — is **outdated**; that doc needs updating
+   [`docs/README.md`](docs/README.md) — is **outdated**; that index is being kept as a short pointer to the published Learn articles
    (see TODOs). Canonical call sequence:
    ```csharp
    var state = LanguageModel.GetReadyState();          // AIFeatureReadyState
@@ -127,6 +127,5 @@ reflect these exact values:
 - **Sample 5 – SDK pin divergence.** This machine only has .NET SDK **10.0.300-preview.0.26177.108**
   installed (not 10.0.302), so `05-LocalAI/.../global.json` pins that preview to build and run
   locally. Normalize to **10.0.302** (matching Samples 1–4) on a host that has it installed.
-- **Sample 5 – `docs/ai-for-lob-apps.md` updated.** The Phi Silica section now uses the correct
-  `Microsoft.Windows.AI.Text.LanguageModel` API (was the outdated `Microsoft.Windows.AI.Generative`)
-  and documents the LAF gate / channel guidance. SME to review the wording.
+- **Docs mirror removal.** The root `docs/` folder is intentionally reduced to a short index
+  (`docs/README.md`) so the repo no longer carries a drifting copy of the Learn articles.
