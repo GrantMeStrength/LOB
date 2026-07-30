@@ -105,19 +105,22 @@ The recommended approach is a `Grid` with proportional (`*`) column and row sizi
 
 ## Navigation patterns for LOB apps
 
-Most LOB apps use one of two navigation patterns:
+Most LOB apps use one of the following navigation patterns:
 
 | Pattern | Control | Best for |
 |---|---|---|
 | Left navigation pane | `NavigationView` | Apps with 5–10 top-level sections; familiar to Windows users |
 | Tab bar | `TabView` | Apps where users work across multiple open records simultaneously |
+| Top-level menu | `MenuBar` | Enterprise apps with many modules, administrative features, or command-heavy workflows
+
+These patterns are not mutually exclusive. Many LOB applications combine them - for example, using a `NavigationView` to switch between modules and a `TabView` to work with multiple open records.
 
 For more information about each control, see:
 
 - [NavigationView](../../develop/ui/controls/navigationview.md) — the left navigation pane pattern
 - [TabView](../../develop/ui/controls/tab-view.md) — the tab bar pattern
 
-> [!TODO] SME: add guidance on choosing between `NavigationView` and `TabView` for LOB scenarios.
+> [!TODO] SME: add guidance on choosing between `NavigationView`, `TabView` and `MenuBar` for LOB scenarios.
 
 ## Get the sample
 
