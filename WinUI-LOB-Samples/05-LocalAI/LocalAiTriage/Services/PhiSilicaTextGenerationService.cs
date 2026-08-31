@@ -7,8 +7,8 @@ namespace LocalAiTriage.Services;
 
 /// <summary>
 /// On-device text generation backed by the Phi Silica small language model in
-/// the Windows App SDK. All work runs locally on the NPU of a Copilot+ PC — no
-/// data leaves the device and no network connection is required.
+/// the Windows App SDK. All work runs on supported local hardware, so no data
+/// leaves the device and no network connection is required for generation.
 /// </summary>
 public sealed class PhiSilicaTextGenerationService : ITextGenerationService, IDisposable
 {
@@ -48,7 +48,7 @@ public sealed class PhiSilicaTextGenerationService : ITextGenerationService, IDi
 
             case AIFeatureReadyState.NotSupportedOnCurrentSystem:
             case AIFeatureReadyState.NotCompatibleWithSystemHardware:
-                return new AiStatus(false, "Local AI (Phi Silica) requires a Copilot+ PC with a compatible NPU.");
+                return new AiStatus(false, "Local AI (Phi Silica) isn't supported by this device's current hardware and software configuration.");
 
             case AIFeatureReadyState.OSUpdateNeeded:
                 return new AiStatus(false, "A Windows update is required before local AI can be used.");

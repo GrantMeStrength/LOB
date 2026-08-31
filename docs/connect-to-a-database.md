@@ -1,190 +1,119 @@
 ---
 title: Connect a WinUI app to a database
-description: Connect a WinUI 3 app to a database using Entity Framework Core, load data asynchronously off the UI thread, and cache data for offline use.
+description: Connect a WinUI 3 app to local or enterprise data using Entity Framework Core, asynchronous operations, and secure service boundaries.
 ms.topic: how-to
-ms.date: 07/29/2026
+ms.date: 08/31/2026
 author: GrantMeStrength
 ms.author: jken
 ---
 
 # Connect a WinUI app to a database
 
-> [!NOTE]
-> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
+A line-of-business app can store data on the device, call an enterprise service, or combine both approaches for offline use. Keep database code outside the UI layer so that you can test it, handle failures consistently, and change providers without rewriting the view.
 
-Line-of-business apps frequently read from and write to a database — an on-device SQLite database, a local SQL Server instance, or a remote database accessed through a service layer. Two data-access options cover most LOB needs: SQLite for local and embedded data, and [Microsoft.Data.SqlClient](https://www.nuget.org/packages/Microsoft.Data.SqlClient) for connecting to SQL Server. This article describes how to connect a WinUI 3 app to a database using Entity Framework Core (EF Core), load data asynchronously so the UI thread stays responsive, and cache data locally for offline scenarios.
+:::image type="content" source="images/03-database-access.png" alt-text="A WinUI 3 task tracker displaying records loaded from a local SQLite database.":::
 
-## Overview
+## Choose an architecture
 
-:::image type="content" source="images/03-database-access.png" alt-text="The WinUI 3 database access sample showing a task tracker app with a list of tasks loaded from SQLite via EF Core. Each task shows a title, due date, and a CheckBox for completion status.":::
-
-| Scenario | Recommended approach |
+| Scenario | Starting point |
 |---|---|
-| On-device data (settings, local records, offline cache) | EF Core + SQLite |
-| Enterprise SQL Server (on-premises or Azure SQL) | `Microsoft.Data.SqlClient`, directly or through the EF Core SQL Server provider |
-| Read-only data from an API | `HttpClient` + JSON deserialization, with optional local cache |
+| Local settings, records, or cache | SQLite, optionally through EF Core |
+| Enterprise data shared by multiple users | An authenticated HTTPS API that owns database access |
+| Direct access in a controlled environment | A supported database client or EF Core provider, with authentication and authorization reviewed for that environment |
+| Read-only service data | `HttpClient` and JSON deserialization, with a local cache if offline access is required |
 
-`Microsoft.Data.SqlClient` is the current, actively maintained SQL Server client library for .NET, and it is the right choice for LOB apps that connect to enterprise SQL Server. You can use it directly or through the EF Core SQL Server provider (`Microsoft.EntityFrameworkCore.SqlServer`), which builds on it.
+Don't embed a shared database password or privileged connection string in a desktop app. A user can inspect files and application memory on a device they control. A service layer protects database topology and provides a central authorization, validation, auditing, and versioning boundary.
 
-> [!IMPORTANT]
-> For security and maintainability, enterprise apps should not connect a client desktop app directly to a shared SQL Server database using embedded credentials. Consider a REST API or gRPC service layer that the WinUI app calls over HTTPS. This article covers both direct (SQLite/local) and service-layer patterns.
+## Use EF Core
 
-> [!TODO] SME validation: confirm the recommended architecture for WinUI 3 LOB apps connecting to corporate databases. Determine whether direct EF Core + SQL Server is acceptable in trusted domain-joined scenarios, or whether a service layer is always the correct guidance.
+EF Core maps .NET objects to a relational database. Its provider model supports SQL Server, SQLite, PostgreSQL, MySQL, MariaDB, Oracle, and other databases. Most data-access code can remain provider-independent, but migrations, SQL features, and type behavior can differ by provider.
 
-## When to use EF Core
-
-Entity Framework Core is appropriate when:
-
-- You need an ORM to map C# objects to database tables without writing raw SQL.
-- You want to minimize database-specific code.
-  - EF Core supports many relational databases through a provider model, including SQL Server, SQLite, PostgreSQL, MySQL, MariaDB, Oracle, and others. This allows most application code to remain unchanged when switching database providers, although some provider-specific features may require changes.
-- You want database migrations to manage schema evolution.
-
-EF Core runs on .NET and is fully supported in WinUI 3 apps built with .NET.
-
-> [!TODO] SME validation: confirm that EF Core runs correctly in WinUI 3 desktop apps (both packaged and unpackaged). Note any packaging or sandboxing considerations that affect database file access in packaged apps (for example, LocalApplicationData path usage).
-
-## Prerequisites
-
-- A WinUI 3 project targeting .NET
-- EF Core NuGet packages (`Microsoft.EntityFrameworkCore` and a provider such as `Microsoft.EntityFrameworkCore.Sqlite` or `Microsoft.EntityFrameworkCore.SqlServer`)
-
-> [!TODO] Confirm minimum EF Core version tested with the current stable Windows App SDK and .NET version. Link to the EF Core Getting Started documentation on learn.microsoft.com.
-
-## Steps
-
-### Step 1: Add EF Core NuGet packages
-
-Add the EF Core and SQLite provider packages:
+Add the provider that your app needs. For SQLite:
 
 ```console
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite
 ```
 
-This pulls in `Microsoft.EntityFrameworkCore` as a dependency. Also pin the SQLite native library to avoid a known CVE (see the [Connection strings and secrets](#connection-strings-and-secrets) section below).
+Keep package versions on a supported servicing release and review transitive dependency advisories as part of normal dependency maintenance.
 
-### Step 2: Define the data model and DbContext
+## Define the model and context
 
-> [!TODO] Provide a C# example defining:
-> - A simple entity class (for example, `Customer` with `Id`, `Name`, `Email`).
-> - A `DbContext` subclass that exposes a `DbSet<Customer>`.
-> - A connection string pointing to a local SQLite database file in the app's data folder.
->
-> For packaged apps, the database file should live under `Windows.Storage.ApplicationData.Current.LocalFolder.Path`. For unpackaged apps, use `Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)`.
->
-> Validate both paths with SME. Do not publish code examples until SME review is complete.
-
-### Step 3: Run migrations and create the database
-
-For a new app, `context.Database.EnsureCreatedAsync()` is the quickest way to create the SQLite database file on first launch. However, `EnsureCreated` does not support schema changes — if you add or rename a column, it will not update an existing database.
-
-For a production LOB app, use EF Core **migrations** (`dotnet ef migrations add` / `dotnet ef database update`) so schema changes can be applied without data loss.
-
-> [!TODO] Add a brief example showing how to add and apply an EF Core migration. Link to the EF Core migrations documentation on learn.microsoft.com.
-
-### Step 4: Load data asynchronously
-
-Loading data on the UI thread blocks the UI and causes the app to become unresponsive. Always load data on a background thread and marshal results back to the UI thread.
-
-In WinUI 3, use `async`/`await` in your ViewModel and ensure that UI property updates are dispatched on the UI thread.
-
-> [!TODO] Provide a C# example showing:
-> - An async ViewModel method (for example, `LoadCustomersAsync`) that calls `await context.Customers.ToListAsync()`.
-> - Assigning the result to an `ObservableCollection<Customer>` property that the View is bound to.
-> - Handling exceptions (database unavailable, connection timeout) and surfacing an error message in the UI.
->
-> Clarify with SME whether `DispatcherQueue.TryEnqueue` is required when setting `ObservableCollection` from a background thread in WinUI 3, or whether this is handled automatically by the binding system.
-
-### Step 5: Save changes
-
-> [!TODO] Provide a C# example showing:
-> - Adding a new entity to the `DbSet<T>` and calling `await context.SaveChangesAsync()`.
-> - Handling `DbUpdateException` for constraint violations (for example, duplicate keys).
->
-> Validate with SME.
-
-### Step 6: Implement offline caching
-
-For apps that need to work without a network connection, a local SQLite cache can mirror data from a remote source. The app writes to the local cache and syncs with the remote service when connectivity is restored.
-
-> [!TODO] Describe a practical offline caching pattern for WinUI 3 LOB apps:
-> - Storing a local SQLite copy of remote data.
-> - Detecting network availability.
-> - Queuing writes when offline and syncing when online.
->
-> This is a complex topic. SME should determine the level of detail appropriate for this article vs. a dedicated offline sync how-to. Do not publish without SME input.
-
-> [!TODO] Evaluate whether to link to Azure Data Sync, Microsoft Sync Framework, or a custom sync implementation. Determine what is supported and recommended for WinUI 3 LOB apps.
-
-## Connection strings and secrets
-
-> [!IMPORTANT]
-> Never embed database connection strings or credentials in source code. For local SQLite, no credentials are needed. For SQL Server or cloud databases, use environment variables, Windows Credential Manager, or a secrets management service.
-
-> [!WARNING]
-> The `SQLitePCLRaw.lib.e_sqlite3` package (a transitive dependency of EF Core + SQLite) has a known CVE in versions prior to 2.1.12. Pin `SQLitePCLRaw.bundle_e_sqlite3` to version **2.1.12 or later** in your project file to stay clean until EF Core ships a newer transitive default:
->
-> ```xml
-> <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
-> ```
-
-> [!TODO] Link to additional guidance on secrets management for WinUI 3 apps.
-
-## Store credentials securely
-
-Instead of keeping SQL Server credentials or API tokens in a configuration file or connection string, store them in the Windows Credential Locker with `Windows.Security.Credentials.PasswordVault`. Credentials saved this way are encrypted per user and roam with the user's Microsoft account on domain-joined and Entra-joined devices.
-
-Store a credential:
+The sample stores its database beneath the current user's local application-data folder, which works for packaged and unpackaged desktop apps:
 
 ```csharp
-using Windows.Security.Credentials;
-
-var vault = new PasswordVault();
-vault.Add(new PasswordCredential("Contoso.LOB.Database", userName, password));
-```
-
-Retrieve it later:
-
-```csharp
-using Windows.Security.Credentials;
-
-var vault = new PasswordVault();
-try
+public sealed class TaskDbContext : DbContext
 {
-    PasswordCredential credential = vault.Retrieve("Contoso.LOB.Database", userName);
-    credential.RetrievePassword();
-    string password = credential.Password;
-    // Use the password to build the connection at runtime.
-}
-catch (Exception)
-{
-    // No stored credential for this resource/user — prompt the user to sign in.
+    public DbSet<TaskItem> Tasks => Set<TaskItem>();
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        string folder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "DatabaseAccess");
+        Directory.CreateDirectory(folder);
+
+        string databasePath = Path.Combine(folder, "tasks.db");
+        options.UseSqlite($"Data Source={databasePath}");
+    }
 }
 ```
 
-If you don't know the user name in advance, enumerate stored credentials for a resource with `vault.FindAllByResource("Contoso.LOB.Database")`.
+Don't write a database into the installed application directory. Choose a per-user or shared data location that matches your deployment and access requirements.
 
-> [!TODO] SME validation: confirm `PasswordVault` behavior and packaging requirements (packaged vs. unpackaged) for WinUI 3 desktop apps, and the recommended pattern for building a connection string from a retrieved credential.
+## Create and evolve the database
 
-See [Credential locker](../../develop/security/credential-locker.md) for more on storing tokens and credentials securely using the Windows Credential Manager.
+`Database.EnsureCreatedAsync()` is convenient for a sample or a database that can be recreated. It bypasses migrations and isn't suitable for evolving a production schema in place.
+
+Use [EF Core migrations](/ef/core/managing-schemas/migrations/) when an app must preserve existing data across schema versions. Test upgrades from every supported deployed version and define a recovery strategy for migration failures.
+
+## Keep the UI responsive
+
+Use asynchronous database and network APIs where the provider implements them. Don't block the UI thread with `.Result`, `.Wait()`, or synchronous network calls.
+
+Asynchronous APIs don't automatically mean that every provider performs all work on a background thread. Isolate data access in a service, measure realistic queries, and move demonstrably blocking provider work off the UI thread when necessary. Update an `ObservableCollection<T>` on the UI thread; use `DispatcherQueue` only when control returns on another thread.
+
+Create a short-lived `DbContext` for each unit of work unless your architecture deliberately manages a longer lifetime. `DbContext` isn't thread-safe.
+
+```csharp
+public async Task<List<TaskItem>> GetAllAsync()
+{
+    await using var db = new TaskDbContext();
+    return await db.Tasks
+        .AsNoTracking()
+        .OrderBy(task => task.DueDate)
+        .ToListAsync();
+}
+```
+
+Catch exceptions at a boundary that can add useful context or present an actionable message. Don't silently convert a failed load or save into an empty or successful result.
+
+## Plan offline synchronization
+
+A local SQLite database can cache remote data, but synchronization is an application protocol, not an EF Core feature. Define:
+
+- Stable record identifiers and a server version or change token.
+- Which operations can be queued offline.
+- How conflicts are detected and resolved.
+- How authorization changes affect cached data.
+- Encryption, retention, and sign-out behavior for sensitive local records.
+
+Test interrupted synchronization, duplicate delivery, clock differences, and a user losing access while offline.
+
+## Protect credentials and tokens
+
+Prefer user identity, managed authentication, and short-lived tokens over stored passwords. Don't put secrets in source code or checked-in configuration. If the app must retain a credential or token, use an appropriate Windows credential-protection API and follow the identity provider's token-cache guidance.
+
+See [Credential locker](../../develop/security/credential-locker.md) for the Windows Credential Locker API. Verify API behavior and packaging requirements for your deployment model rather than assuming credentials roam between devices.
 
 ## Get the sample
 
-The database access sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/03-DatabaseAccess/` folder.
+The [database access sample](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/03-DatabaseAccess) uses EF Core with a local SQLite database and separates data operations from the page.
 
-The sample adapts to the system theme. The following screenshots show it running in the light and dark themes.
-
-:::image type="content" source="images/03-database-access.png" alt-text="The database access sample running in the light theme, showing a task tracker list loaded from SQLite via EF Core.":::
-
-:::image type="content" source="images/03-database-access-dark.png" alt-text="The database access sample running in the dark theme, showing a task tracker list loaded from SQLite via EF Core.":::
-
-> [!NOTE]
-> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
+:::image type="content" source="images/03-database-access-dark.png" alt-text="The SQLite task tracker sample running in the dark theme.":::
 
 ## Related content
 
-- [Data binding overview](../../develop/data-binding/data-binding-overview.md)
+- [EF Core documentation](/ef/core/)
+- [HTTP client](../../develop/networking/httpclient.md)
 - [Data binding and MVVM](../../develop/data-binding/data-binding-and-mvvm.md)
-- [Build a data-entry form with validation](build-validated-form.md)
-- [Display tabular data in a WinUI app](display-tabular-data.md)
 - [Credential locker](../../develop/security/credential-locker.md)

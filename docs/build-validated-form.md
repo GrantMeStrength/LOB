@@ -1,67 +1,100 @@
 ---
 title: Build a data-entry form with validation in WinUI 3
-description: Build a data-entry form in WinUI 3 with input validation using the ObservableValidator base class from the CommunityToolkit.Mvvm package.
-ms.topic: tutorial
-ms.date: 07/29/2026
+description: Design a WinUI 3 data-entry form and implement validation with an approach that fits your app architecture.
+ms.topic: how-to
+ms.date: 08/31/2026
 author: GrantMeStrength
 ms.author: jken
 ---
 
 # Build a data-entry form with validation in WinUI 3
 
-> [!NOTE]
-> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
+Data-entry forms must explain requirements, identify invalid values, and prevent unsafe operations without making keyboard or assistive-technology use difficult.
 
-Data-entry forms are central to line-of-business apps. Users enter information — customer records, work orders, inventory items — and the app must validate that data before saving it. In WinUI 3, the recommended approach is the `ObservableValidator` base class from the MVVM Toolkit (`CommunityToolkit.Mvvm`), which implements `INotifyDataErrorInfo` and drives validation from data-annotation attributes on your ViewModel.
+WinUI 3 doesn't provide a complete form-validation framework equivalent to WPF validation or the Windows Forms `ErrorProvider`. Your app must define how validation rules run, how errors are exposed, and how the UI presents them.
 
-## Overview
+:::image type="content" source="images/02-validated-form.png" alt-text="A New Customer form with an inline email validation message and a disabled Save button.":::
 
-WinUI 3 has no built-in form-validation control like the WPF `Validation` class or the WinForms `ErrorProvider`. Instead, validation is implemented in the ViewModel and surfaced through data binding. The `ObservableValidator` base class in the MVVM Toolkit provides this: you annotate ViewModel properties with `System.ComponentModel.DataAnnotations` attributes (such as `[Required]` or `[EmailAddress]`), call `ValidateAllProperties()` or `ValidateProperty()`, and read validation errors through `GetErrors()` and `HasErrors`.
+## Choose a validation strategy
 
-`CommunityToolkit.Mvvm` (the MVVM Toolkit) is a live, Microsoft-maintained NuGet package. It is distinct from the unmaintained Community Toolkit `DataGrid` control and is the current recommended MVVM library for WinUI apps.
+Common approaches include:
 
-> [!TODO] SME review: confirm the recommended validation pattern (attribute-based `ObservableValidator` vs. a manual `INotifyDataErrorInfo` implementation) and the error-display approach before this article is published.
+- Validate values directly in a model or view model and expose error properties.
+- Implement `INotifyDataErrorInfo` when your binding architecture uses its error model.
+- Use `ObservableValidator` from the Microsoft-maintained `CommunityToolkit.Mvvm` package to combine `INotifyDataErrorInfo` with data-annotation attributes.
+- Use a dedicated validation library when your app needs cross-field rules, server validation, or a shared rules engine.
 
-## What you'll build
+`ObservableValidator` is one option, not a WinUI platform recommendation. The sample for this article uses it to demonstrate a compact MVVM implementation.
 
-:::image type="content" source="images/02-validated-form.png" alt-text="The WinUI 3 validated form sample showing a New Customer form with Name, Email, Phone, and Region fields. The Email field shows an inline validation error message. The Save button is disabled.":::
+## Add the MVVM Toolkit
 
-> [!TODO] Expand this description once SME has reviewed the form validation approach and confirmed the error display mechanism.
-
-## Prerequisites
-
-- Windows App SDK (stable channel) installed
-- A WinUI 3 project created from the "Blank App, Packaged (WinUI 3 in Desktop)" template or equivalent
-- The `CommunityToolkit.Mvvm` NuGet package (namespace `CommunityToolkit.Mvvm.ComponentModel`)
-
-## Add the MVVM Toolkit package
-
-Add the `CommunityToolkit.Mvvm` package to your project:
+If you choose the sample's approach, add the package:
 
 ```console
 dotnet add package CommunityToolkit.Mvvm
 ```
 
-Your validating ViewModel then derives from `ObservableValidator` (in the `CommunityToolkit.Mvvm.ComponentModel` namespace).
+Define observable partial properties and attach validation attributes:
 
-## Steps
+```csharp
+public partial class NewCustomerViewModel : ObservableValidator
+{
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Name is required.")]
+    public partial string Name { get; set; } = string.Empty;
 
-> [!TODO] The full step-by-step walkthrough (annotating properties, triggering validation on input, binding error messages to the UI, and enabling or disabling the Save button based on `HasErrors`) is not yet written. Author it against the `ObservableValidator` pattern above; do not scaffold around the unmaintained Community Toolkit `DataGrid` control.
+    [ObservableProperty]
+    [NotifyDataErrorInfo]
+    [Required(ErrorMessage = "Email is required.")]
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    public partial string Email { get; set; } = string.Empty;
+}
+```
+
+The partial-property form is the current MVVM Toolkit source-generator syntax. It also allows validation attributes to apply to the generated property.
+
+## Decide when to validate
+
+Choose timing deliberately:
+
+- Validate while typing when immediate feedback helps users fix a value.
+- Validate when focus leaves a field when per-keystroke errors would be distracting.
+- Validate the complete object before saving to catch cross-field and business rules.
+- Validate again at the service or database boundary. Client-side validation is not a security boundary.
+
+The sample calls `ValidateAllProperties()` when the view model is created and uses generated property validation as values change.
+
+## Present errors accessibly
+
+Place the message near the invalid control and update it through binding:
+
+```xml
+<TextBox
+    AutomationProperties.AutomationId="EmailTextBox"
+    Header="Email (required)"
+    Text="{x:Bind ViewModel.Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+<TextBlock
+    AutomationProperties.AutomationId="EmailError"
+    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+    Style="{StaticResource CaptionTextBlockStyle}"
+    Text="{x:Bind ViewModel.EmailError, Mode=OneWay}" />
+```
+
+Don't communicate an error by color alone. Include text, preserve a logical keyboard order, and move focus or provide a summary when submission fails because an error is outside the visible area.
+
+Disable a save command only when users can understand why it is unavailable. For longer forms, allowing submission and then focusing the first invalid field can be clearer.
+
+## Handle server-side errors
+
+Local validation can't detect every conflict. A service can reject a value because of authorization, uniqueness, or a concurrent update. Keep those errors distinct from local format errors, preserve the user's input, and provide an actionable message.
 
 ## Get the sample
 
-The validated form sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/02-ValidatedForm/` folder.
+The [validated form sample](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/02-ValidatedForm) demonstrates `ObservableValidator`, inline messages, command enablement, and accessible control identifiers.
 
-The sample adapts to the system theme. The following screenshots show it running in the light and dark themes.
-
-:::image type="content" source="images/02-validated-form.png" alt-text="The validated form sample running in the light theme, showing a New Customer form with an inline validation error on the Email field.":::
-
-:::image type="content" source="images/02-validated-form-dark.png" alt-text="The validated form sample running in the dark theme, showing a New Customer form with an inline validation error on the Email field.":::
-
-> [!NOTE]
-> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
-
-> [!TODO] SME review: confirm the sample reflects the recommended `ObservableValidator` validation approach before this article links it as canonical guidance.
+:::image type="content" source="images/02-validated-form-dark.png" alt-text="The New Customer form running in the dark theme with an inline email validation message.":::
 
 ## Related content
 
@@ -69,4 +102,3 @@ The sample adapts to the system theme. The following screenshots show it running
 - [Data binding in depth](../../develop/data-binding/data-binding-in-depth.md)
 - [Data binding and MVVM](../../develop/data-binding/data-binding-and-mvvm.md)
 - [Connect a WinUI app to a database](connect-to-a-database.md)
-- [Display tabular data in a WinUI app](display-tabular-data.md)

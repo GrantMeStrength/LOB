@@ -74,7 +74,7 @@
                         Header="Region (required)"
                         HorizontalAlignment="Stretch"
                         PlaceholderText="Select a region"
-                        ItemsSource="{x:Bind ViewModel.Regions}"
+                        ItemsSource="{x:Bind ViewModel.Regions, Mode=OneWay}"
                         SelectedItem="{x:Bind ViewModel.Region, Mode=TwoWay}" />
                     <TextBlock
                         AutomationProperties.AutomationId="RegionError"
