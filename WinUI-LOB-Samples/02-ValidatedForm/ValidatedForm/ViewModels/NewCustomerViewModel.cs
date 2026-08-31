@@ -17,21 +17,21 @@ public partial class NewCustomerViewModel : ObservableValidator
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Name is required.")]
-    private string _name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Enter a valid email address.")]
-    private string _email = string.Empty;
+    public partial string Email { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _phone = string.Empty;
+    public partial string Phone { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Region is required.")]
-    private string? _region;
+    public partial string? Region { get; set; }
 
     private string _statusMessage = string.Empty;
     private bool _isStatusOpen;

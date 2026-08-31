@@ -52,9 +52,10 @@
 
                     <ItemsView
                         x:Name="TicketsList"
+                        AutomationProperties.AutomationId="TicketsList"
                         Padding="8"
                         IsItemInvokedEnabled="False"
-                        ItemsSource="{x:Bind ViewModel.Tickets}"
+                        ItemsSource="{x:Bind ViewModel.Tickets, Mode=OneWay}"
                         SelectionChanged="OnTicketSelectionChanged"
                         SelectionMode="Single">
                         <ItemsView.Layout>
@@ -96,21 +97,22 @@
                         x:Load="{x:Bind IsTicketSelected(ViewModel.SelectedTicket), Mode=OneWay}"
                         Spacing="16">
                         <StackPanel Spacing="4">
-                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.SelectedTicket.Subject, Mode=OneWay}" />
+                            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.SelectedTicket.Subject, Mode=OneWay, FallbackValue=''}" />
                             <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}">
-                                <Run Text="{x:Bind ViewModel.SelectedTicket.CustomerName, Mode=OneWay}" />
+                                <Run Text="{x:Bind ViewModel.SelectedTicket.CustomerName, Mode=OneWay, FallbackValue=''}" />
                                 <Run Text="&#8226;" />
-                                <Run Text="{x:Bind ViewModel.SelectedTicket.Product, Mode=OneWay}" />
+                                <Run Text="{x:Bind ViewModel.SelectedTicket.Product, Mode=OneWay, FallbackValue=''}" />
                             </TextBlock>
                         </StackPanel>
 
                         <TextBlock
                             Style="{StaticResource BodyTextBlockStyle}"
-                            Text="{x:Bind ViewModel.SelectedTicket.Body, Mode=OneWay}"
+                            Text="{x:Bind ViewModel.SelectedTicket.Body, Mode=OneWay, FallbackValue=''}"
                             TextWrapping="Wrap" />
 
                         <Button
                             x:Name="TriageButton"
+                            AutomationProperties.AutomationId="TriageButton"
                             AutomationProperties.Name="Run AI triage on the selected ticket"
                             Command="{x:Bind ViewModel.TriageSelectedCommand}"
                             Style="{StaticResource AccentButtonStyle}">
@@ -118,14 +120,14 @@
                                 <ProgressRing
                                     Width="16"
                                     Height="16"
-                                    IsActive="{x:Bind ViewModel.SelectedTicket.IsProcessing, Mode=OneWay}" />
+                                    IsActive="{x:Bind ViewModel.SelectedTicket.IsProcessing, Mode=OneWay, FallbackValue=False}" />
                                 <TextBlock Text="Triage with local AI" />
                             </StackPanel>
                         </Button>
 
                         <Border
                             x:Name="TriageResult"
-                            x:Load="{x:Bind ViewModel.SelectedTicket.HasTriage, Mode=OneWay}"
+                            x:Load="{x:Bind ViewModel.SelectedTicket.HasTriage, Mode=OneWay, FallbackValue=False}"
                             Padding="16"
                             Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -145,7 +147,7 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Style="{StaticResource CaptionTextBlockStyle}"
                                         Text="Suggested category" />
-                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.SelectedTicket.Category, Mode=OneWay}" />
+                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.SelectedTicket.Category, Mode=OneWay, FallbackValue=''}" />
                                 </StackPanel>
 
                                 <StackPanel Spacing="4">
@@ -155,7 +157,7 @@
                                         Text="Summary" />
                                     <TextBlock
                                         Style="{StaticResource BodyTextBlockStyle}"
-                                        Text="{x:Bind ViewModel.SelectedTicket.Summary, Mode=OneWay}"
+                                        Text="{x:Bind ViewModel.SelectedTicket.Summary, Mode=OneWay, FallbackValue=''}"
                                         TextWrapping="Wrap" />
                                 </StackPanel>
                             </StackPanel>

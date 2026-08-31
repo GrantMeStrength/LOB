@@ -1,147 +1,114 @@
 ---
 title: Add AI capabilities to a line-of-business WinUI app
-description: How to integrate on-device AI (Phi Silica, ONNX Runtime) and cloud AI (Azure OpenAI) into a line-of-business WinUI 3 app.
+description: Compare on-device Windows AI, ONNX Runtime, and cloud AI approaches for line-of-business WinUI 3 apps.
 ms.topic: how-to
-ms.date: 07/29/2026
+ms.date: 08/31/2026
 author: GrantMeStrength
 ms.author: jken
 ---
 
 # Add AI capabilities to a line-of-business WinUI app
 
-AI can enhance LOB apps with summarization, data extraction, classification, and natural-language search. Windows provides multiple paths depending on connectivity, privacy, and compute requirements.
+AI can add summarization, extraction, classification, search, and assistance to a business workflow. Choose an architecture based on data policy, model quality, supported hardware, connectivity, latency, and operating cost.
 
-> [!NOTE]
-> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
-
-## Overview
-
-:::image type="content" source="images/05-local-ai.png" alt-text="The WinUI 3 line-of-business AI sample summarizing customer text on-device with Phi Silica and showing the generated result in the app window.":::
+:::image type="content" source="images/05-local-ai.png" alt-text="A WinUI 3 support-ticket app displaying an on-device AI summary and suggested category.":::
 
 ## Prerequisites
 
-- A WinUI 3 project built with the Windows App SDK
-- Visual Studio with the Windows App SDK / WinUI workload
-- For on-device Phi Silica: a Copilot+ PC with an NPU
-- For Azure OpenAI: an Azure subscription and network connectivity
+- Complete the [WinUI setup instructions](../../get-started/start-here.md) and create a WinUI 3 app.
+- Review the [Windows AI APIs overview](/windows/ai/) and the requirements for the API version you plan to use.
+- For cloud AI, configure an approved Azure resource, identity, network path, and data-governance policy.
 
-## Decision guide
+WinUI 3 is delivered as part of the Windows App SDK; it isn't a separate UI framework that you add to a WinUI 3 project afterward.
 
-| Scenario | Recommended approach | Requires |
-|----------|---------------------|----------|
-| Summarize text, extract fields, classify records | **Phi Silica** (on-device SLM) | Copilot+ PC with NPU |
-| General-purpose chat, RAG, code gen | **Azure OpenAI** (cloud) | Azure subscription + network |
-| Custom vision/NLP models | **ONNX Runtime** (on-device) | Model file + DirectML |
-| OCR, speech-to-text, translation | **Windows platform APIs** | Windows 11 |
+## Choose an approach
 
-## On-device AI with Phi Silica
+| Requirement | Approach |
+|---|---|
+| Supported built-in on-device language capability | Windows AI language-model APIs |
+| A custom model that must run locally | ONNX Runtime with an applicable execution provider |
+| A larger general-purpose model, retrieval, or centralized governance | Azure AI service |
+| OCR, speech, or other Windows capability | The applicable Windows platform API |
 
-> [!IMPORTANT]
-> **Phi Silica is being replaced by Aion Instruct**, a new on-device model. Aion Instruct begins rolling out to Windows Insider Preview devices in October 2026 and to retail devices in November 2026, at which point Phi Silica is removed. Unlike Phi Silica, Aion Instruct doesn't require Limited Access Feature (LAF) tokens. Plan your transition now. See [Get started with Phi Silica](/windows/ai/apis/phi-silica) for the timeline and transition details.
+Don't select an on-device model from the processor name alone. Verify the current API's OS, Windows App SDK, model, and hardware requirements. Supported APIs can use different NPU or GPU configurations.
 
-Phi Silica is a small language model (SLM) that runs locally on Copilot+ PCs via the NPU. It requires no network and keeps data on-device.
+## Use the Windows AI language model
+
+The Windows AI language-model APIs expose readiness states so that an app can detect whether a model is available and prepare it before generation.
 
 ```csharp
-using Microsoft.Windows.AI;         // AIFeatureReadyState
-using Microsoft.Windows.AI.Text;    // LanguageModel
+using Microsoft.Windows.AI;
+using Microsoft.Windows.AI.Text;
 
-// Make sure the model is present and prepared (off the UI thread).
 if (LanguageModel.GetReadyState() == AIFeatureReadyState.NotReady)
 {
     await LanguageModel.EnsureReadyAsync();
 }
 
-using LanguageModel model = await LanguageModel.CreateAsync();
-LanguageModelResponseResult result = await model.GenerateResponseAsync(
-    "Summarize this customer complaint: " + complaintText);
-
-if (result.Status == LanguageModelResponseStatus.Complete)
+if (LanguageModel.GetReadyState() == AIFeatureReadyState.Ready)
 {
-    string summary = result.Text;
+    using LanguageModel model = await LanguageModel.CreateAsync();
+    LanguageModelResponseResult result =
+        await model.GenerateResponseAsync(prompt);
+
+    if (result.Status == LanguageModelResponseStatus.Complete)
+    {
+        string response = result.Text;
+    }
 }
 ```
 
+Handle every non-ready and incomplete state that the version you target can return. Show a clear status, disable unavailable commands, and provide a non-AI or approved cloud fallback where the workflow requires one.
+
 > [!IMPORTANT]
-> Phi Silica is only available on Copilot+ PCs (Snapdragon X, Intel Core Ultra, AMD Ryzen AI). Provide a graceful fallback for other hardware. Your package must declare the `systemAIModels` restricted capability.
+> Windows is transitioning its built-in language model from Phi Silica to Aion Instruct. Phi Silica is a Limited Access Feature on stable releases, while Aion Instruct doesn't require a Limited Access Feature token. Review [Get started with Phi Silica](/windows/ai/apis/phi-silica) and the current Windows AI release guidance before choosing package capabilities or shipping a dependency on either model.
 
-> [!NOTE]
-> On the **stable** Windows App SDK channel, the Phi Silica language model is a [Limited Access Feature](/uwp/api/windows.applicationmodel.limitedaccessfeatures) (`com.microsoft.windows.ai.languagemodel`). Third-party packages need a Microsoft-issued unlock token bound to their package identity, or `GenerateResponseAsync` fails with *"Access is denied."* For development and testing, the [experimental channel](/windows/apps/windows-app-sdk/experimental-channel) does **not** require a token. See the [API troubleshooting guide](/windows/ai/apis/troubleshooting) and the runnable [Sample 05 – LocalAI](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/05-LocalAI), which demonstrates this pattern with graceful degradation when the gate blocks generation.
+The sample associated with this article targets the Phi Silica API and demonstrates readiness checks and graceful failure. Treat it as a transition sample, not a promise that the same model is present on every supported Windows device.
 
-### Detect readiness and provide a fallback
+## Use a cloud AI service
 
-On-device Phi Silica is only available on Copilot+ PCs with an NPU, and even there the model may need to be prepared before first use. Detect availability before you call the model, and fall back gracefully when it isn't ready.
+For a cloud model:
 
-- **Detect.** Call `LanguageModel.GetReadyState()`. It returns an `AIFeatureReadyState` value. `Ready` means you can use the model immediately; `NotReady` means the model is supported but needs preparation — call `EnsureReadyAsync()` (off the UI thread) to download or provision it. Other states indicate the feature isn't available on the current hardware or hasn't been enabled.
-- **Use.** When the state is `Ready`, create the model and generate a response, as shown above.
-- **Fall back.** When on-device generation isn't available — unsupported hardware, or the Limited Access Feature gate blocks generation on the stable channel — degrade gracefully. Disable the AI feature with a clear message, or route the request to a cloud model such as Azure OpenAI (see the next section). Choose on-device when data must stay local or you need offline/low-latency inference; choose cloud when you need a larger model or on-device isn't available.
+- Authenticate with an identity flow approved for your organization.
+- Keep service credentials out of the client app.
+- Apply timeouts, cancellation, bounded retries, and rate-limit handling.
+- Tell users when data leaves the device.
+- Apply the organization's retention, regional-processing, and content-safety requirements.
+- Monitor quality and cost using production-like request sizes.
 
-> [!TODO] SME validation: confirm the exact `AIFeatureReadyState` member names and the recommended handling for each state against the current stable Windows App SDK release, and confirm the recommended pattern for switching between on-device and cloud models at runtime.
+Prefer a service owned by your organization when the desktop client would otherwise need a privileged secret.
 
-## Cloud AI with Azure OpenAI
+## Run a custom model with ONNX Runtime
 
-For apps that need GPT-4o or other large models:
-
-```csharp
-using Azure.AI.OpenAI;
-using Azure.Identity;
-
-var client = new AzureOpenAIClient(
-    new Uri("https://your-resource.openai.azure.com/"),
-    new DefaultAzureCredential());
-
-var chatClient = client.GetChatClient("gpt-4o");
-var response = await chatClient.CompleteChatAsync(
-    new ChatMessage[] { new UserChatMessage(prompt) });
-```
-
-> [!TODO]
-> Add guidance on token management, retry policies, and cost estimation for LOB scenarios (100–10K requests/day).
-
-## On-device inference with ONNX Runtime
-
-For custom models (classification, anomaly detection):
+ONNX Runtime can run a packaged model on the device:
 
 ```csharp
-using Microsoft.ML.OnnxRuntime;
-
-var session = new InferenceSession("model.onnx");
-var inputs = new List<NamedOnnxValue> { /* tensor inputs */ };
-var results = session.Run(inputs);
+using var session = new InferenceSession("model.onnx");
+using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results =
+    session.Run(inputs);
 ```
 
-Use DirectML for GPU acceleration on Windows.
+Choose and test an execution provider for the target hardware. Include model files in your servicing, licensing, integrity, and update plans. Dispose sessions and result objects.
 
-## Windows platform AI APIs
+## Design the user experience
 
-- **OCR:** `Windows.Media.Ocr.OcrEngine`
-- **Speech-to-text:** `Windows.Media.SpeechRecognition`
-- **Text-to-speech:** `Windows.Media.SpeechSynthesis`
-- **Translation:** (Requires Azure Translator or on-device model)
-
-## Best practices for AI in LOB apps
-
-1. **Run inference off the UI thread** — always use `async`/`await`.
-2. **Provide feedback** — show a progress ring during inference.
-3. **Handle hardware absence gracefully** — check `LanguageModel.GetReadyState()` returns `AIFeatureReadyState.Ready` before using Phi Silica, and handle the Limited Access Feature gate on the stable channel.
-4. **Respect data privacy** — on-device models keep data local; cloud models send data to Azure (ensure compliance).
-5. **Cache results** — don't re-run inference for identical inputs.
+1. Keep the UI responsive and support cancellation for longer operations.
+2. Show progress and identify AI-generated output.
+3. Let users review consequential suggestions before applying them.
+4. Preserve source data and make corrections possible.
+5. Record enough context for diagnostics without logging sensitive prompts or output.
+6. Evaluate the feature with representative business data and failure cases.
 
 ## Get the sample
 
-The local AI sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/05-LocalAI/` folder.
+The [local AI sample](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/05-LocalAI) performs support-ticket summarization and classification and surfaces model availability in the UI.
 
-The sample adapts to the system theme. The following screenshots show it running in the light and dark themes.
-
-:::image type="content" source="images/05-local-ai.png" alt-text="The local AI sample running in the light theme, showing the summarized customer text in the app window.":::
-
-:::image type="content" source="images/05-local-ai-dark.png" alt-text="The local AI sample running in the dark theme, showing the summarized customer text in the app window.":::
-
-> [!NOTE]
-> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
+:::image type="content" source="images/05-local-ai-dark.png" alt-text="The support-ticket AI sample running in the dark theme.":::
 
 ## Related content
 
 - [Windows AI APIs overview](/windows/ai/)
 - [Phi Silica documentation](/windows/ai/apis/phi-silica)
+- [Windows AI troubleshooting](/windows/ai/apis/troubleshooting)
 - [Azure OpenAI Service](/azure/ai-services/openai/)
 - [ONNX Runtime](https://onnxruntime.ai/)

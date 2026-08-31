@@ -1,146 +1,115 @@
 ---
 title: Design for productivity in WinUI LOB apps
-description: Design WinUI 3 line-of-business apps for productivity with guidance on theming, materials, accessibility, and responsive layouts.
+description: Design WinUI 3 line-of-business apps for productivity with guidance on theming, materials, accessibility, layouts, and navigation.
 ms.topic: concept-article
-ms.date: 07/29/2026
+ms.date: 08/31/2026
 author: GrantMeStrength
 ms.author: jken
 ---
 
 # Design for productivity in WinUI LOB apps
 
-> [!NOTE]
-> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
+Productivity-focused apps must make frequent tasks efficient while remaining readable, accessible, and predictable. Start with WinUI controls and theme resources, then customize only where the workflow requires it.
 
-> [!TODO] Add screenshots showing several representative LOB app types (data-entry form, tabular data view, dashboard, navigation pane layout) demonstrating WinUI 3 Fluent Design in a business context. Images should show both light and dark themes.
+:::image type="content" source="images/04-design-showcase.png" alt-text="A WinUI 3 dashboard with a NavigationView, Mica backdrop, and summary cards in the light theme.":::
 
-:::image type="content" source="images/04-design-showcase.png" alt-text="The WinUI 3 design showcase sample app showing a NavigationView with Mica backdrop and a dashboard pane with summary cards in light theme.":::
+## Use theme resources
 
-WinUI 3 apps look modern on Windows 11 by default — you don't need custom styling to get a Fluent Design appearance. Built-in controls automatically handle light and dark mode, system accent color, accessibility contrast ratios, and touch/keyboard/mouse input.
+WinUI controls respond to light, dark, and contrast themes when you keep their default styles and use theme resources instead of hardcoded colors.
 
-LOB apps benefit from information density, efficient keyboard navigation, and comfort during long working sessions. WinUI 3 and Fluent Design let you deliver those qualities while still looking modern and polished — an efficient business tool doesn't have to look dated. This article covers the WinUI 3 design features most relevant to productivity-focused apps.
+For example, use `CardBackgroundFillColorDefaultBrush` for a layered card surface and `TextFillColorSecondaryBrush` for secondary text. Don't use an old application-page brush as a universal background, and don't assume the default window surface is an opaque solid color.
 
-> [!TIP]
-> **Quick reference:** When styling a WinUI 3 LOB app:
-> - Use system brushes (for example, `ApplicationPageBackgroundThemeBrush`) rather than hardcoded color values
-> - Reserve `AcrylicBackdrop` for transient surfaces such as flyouts and menus
-> - Always test in both light and dark themes before shipping
+Test every customized color combination in:
 
-## Overview
+- Light theme
+- Dark theme
+- Windows contrast themes
+- Disabled, pointer-over, pressed, selected, and focused states
 
-| Design area | Default behavior | LOB recommendation |
-|---|---|---|
-| Theme | Follows Windows light/dark setting | No change needed; test both modes |
-| Background material | Solid system color | Mica on title bar/nav pane; solid on content areas |
-| Accent color | Follows Windows system accent | No change needed; do not hardcode brand colors |
-| Accessibility | WCAG-compliant contrast in default themes | Test with high-contrast mode; avoid custom colors that break contrast |
-| Layout | Fixed by default | Use `Grid` + `VisualStateManager` for adaptive window widths |
+See [Theming](../../develop/ui/theming.md).
 
-## Theming and dark mode
+## Preserve usable control sizing
 
-WinUI 3 apps automatically follow the user's Windows theme — light or dark. You get this for free when you use system brushes and the default control styles.
+WinUI doesn't provide a general-purpose compact mode that is appropriate for every control and workflow. Start with the default control sizes. If a screen needs to show more information, first improve grouping, filtering, progressive disclosure, and window adaptation.
 
-The most common design bug in LOB apps is hardcoded colors: a hex value that looks fine in light mode becomes invisible in dark mode. Always use named theme resources (for example, `TextFillColorPrimaryBrush`, `CardBackgroundFillColorDefaultBrush`) rather than hardcoded `#RRGGBB` values.
+When you adjust spacing for a specific workflow, preserve readable text, keyboard focus visuals, pointer targets, and touch targets. Test the actual controls and input methods rather than applying an app-wide density override.
 
-- [Theming](../../develop/ui/theming.md)
+## Use Mica and Acrylic materials deliberately
 
-> [!TODO] SME: confirm the recommended set of named system brushes for common LOB UI surfaces (card background, list item background, secondary text). Link to the WinUI 3 design token reference if one exists.
+Use Mica as a base layer that establishes the window hierarchy, such as behind app chrome or navigation. Place readable content on appropriate layered surfaces, including theme-resource card brushes.
 
-## Information density
+Acrylic materials provide separation for transient UI such as flyouts and menus. Avoid placing dense, persistent data directly on a highly translucent surface. Let the platform controls use their intended materials instead of applying a backdrop type to every surface.
 
-WinUI 3 controls use comfortable padding by default — appropriate for consumer and touch-first apps. LOB apps that display dense data (transaction grids, inventory tables, scheduling views) often need to fit more information on screen.
-
-> [!IMPORTANT]
-> The compact resource dictionary (`Microsoft.UI.Xaml/DensityStyles/Compact.xaml`) is deprecated and isn't recommended. Some controls may still respond to it, but applying it app-wide can break layout and behavior in ways that are hard to predict.
-
-> [!TODO] SME review: recommend a current approach to information density in LOB apps (for example, targeted spacing adjustments on specific controls) now that the compact density dictionary is deprecated.
-
-## Materials: Mica and Acrylic
-
-Mica and Acrylic are translucent background materials. For LOB apps their value is a modern, trustworthy, low-fatigue look: a subtle sense of depth and a clear separation between chrome (navigation, title bar) and content, without the flat, dated appearance of older business tools. Used sparingly, they reinforce visual hierarchy while keeping data areas fully readable.
-
-**Mica** samples the desktop wallpaper and applies a tinted surface based on the wallpaper color. It is best suited for the app's background window layer — typically behind a navigation pane or title bar area.
-
-**Acrylic** is a more vivid translucent effect. In LOB apps it is appropriate for transient surfaces such as flyouts, tooltips, and context menus.
-
-Because it's translucent, **Acrylic** can reduce the readability of text placed directly on top of it, so reserve it for transient surfaces rather than dense, content-heavy data areas.
-
-> [!TODO] SME review: clarify the recommended use of Mica and Acrylic behind LOB data surfaces (grids, forms, dense lists), including whether Mica as a window base layer is appropriate when opaque content sits on top.
-
-- [System backdrops (Mica and Acrylic)](../../develop/ui/system-backdrops.md)
+- [System backdrops](../../develop/ui/system-backdrops.md)
 - [In-app Acrylic](../../develop/ui/in-app-acrylic.md)
+- [Mica](../../design/style/mica.md)
 
-## Secondary windows (child and modal)
+## Choose dialogs and windows
 
-LOB apps often need more than one window — a main records view plus tool windows, property inspectors, or modal prompts. WinUI 3 supports two distinct patterns:
+Use a `ContentDialog` for a short modal interaction within an existing window. Set the dialog's `XamlRoot` before calling `ShowAsync`.
 
-- **Modal-in-window dialogs.** Use `ContentDialog` for a modal interaction that overlays the current window (confirmations, short forms, prompts). A `ContentDialog` requires a `XamlRoot`, which you set from the hosting element or window before calling `ShowAsync()`. This is the standard WinUI pattern for blocking the current view until the user responds.
-- **Additional top-level windows.** Create another `Microsoft.UI.Xaml.Window` for a tool window, secondary document, or floating panel, and show it alongside the main window. Each `Window` has its own content tree and lifetime.
+Create another `Microsoft.UI.Xaml.Window` when users need to work with an independent document, tool window, or secondary view. A separate window has its own content tree and lifetime. Don't treat a secondary `Window` as a direct replacement for every owned or modal window pattern from older desktop frameworks; design and test the owner, activation, and closing behavior your scenario requires.
 
-> [!TODO] SME review: WinUI 3's support for a *true modal* child window (a separate `Window` that blocks its owner) is limited. Confirm the current recommended approach for owner/child window relationships and modal behavior across separate windows, and add a verified code example.
+- [Multiple windows](../../develop/ui/multiple-windows.md)
+- [Dialogs and flyouts](../../develop/ui/controls/dialogs-and-flyouts/dialogs.md)
 
-## Accessibility
+## Design for accessibility
 
-Accessibility is critical for LOB apps: enterprise and government customers frequently require conformance with standards such as Section 508 (U.S.) and EN 301 549 (EU). WinUI 3 inbox controls are built on the UI Automation (UIA) accessibility framework and pass WCAG contrast requirements in the default light and dark themes, so you get accessible controls for free — as long as you don't undermine them.
+Default WinUI controls provide accessibility behavior, but the app is responsible for meaningful names, relationships, order, and custom interaction.
 
-- **Names for interactive elements.** Provide meaningful `AutomationProperties.Name` values on controls that lack a visible text label (for example, icon-only buttons), so Narrator and other assistive technologies can announce them.
-- **Keyboard and tab order.** Ensure every interactive control is reachable by keyboard and that focus moves in a logical order. Use `TabIndex` to correct the order where the visual layout and the default order differ, and `IsTabStop` to skip non-interactive elements.
-- **Contrast and theming.** Don't override default control styles with custom colors that reduce contrast. Test in Windows High Contrast mode (Settings → Accessibility → Contrast themes) as well as light and dark themes.
-- **Focus visuals.** Keep the default focus visuals so keyboard users can see which element has focus; don't remove focus indicators for aesthetic reasons.
-- **Test with Narrator.** Walk the app end to end with Narrator to confirm that names, states, and reading order make sense.
+- Give icon-only controls an `AutomationProperties.Name`.
+- Use labels or headers that identify editable fields.
+- Keep interactive controls reachable by keyboard in a logical order.
+- Keep visible focus indicators.
+- Don't communicate state or validation by color alone.
+- Test text scaling, contrast themes, Narrator, and keyboard-only operation.
 
-> [!TODO] Add a short, verified example demonstrating `AutomationProperties.Name` on an icon-only button and a corrected tab order, and link a full accessibility walkthrough once the sample supports it.
+```xml
+<Button
+    AutomationProperties.AutomationId="DeleteCustomerButton"
+    AutomationProperties.Name="Delete selected customer">
+    <FontIcon Glyph="&#xE74D;" />
+</Button>
+```
 
 See [Accessibility overview](../../design/accessibility/accessibility-overview.md) and [Accessibility testing](../../design/accessibility/accessibility-testing.md).
 
-## Responsive layout
+## Adapt the layout
 
-LOB apps are used on a wide range of monitor sizes and at varying window widths — from a narrow side panel to a maximized ultrawide display. Design your layout to adapt.
+Use `Grid` sizing and visual states to adapt the information hierarchy as the window changes. Avoid simply shrinking every element.
 
-The recommended approach is a `Grid` with proportional (`*`) column and row sizing, combined with `VisualStateManager` adaptive triggers that reorganize the layout at specific window widths.
+At narrower widths, you can:
 
-- [Responsive design](../../design/layout/responsive-design.md)
+- Move a details pane below or behind the list.
+- Change `NavigationView` display mode.
+- Collapse secondary metadata while keeping essential status visible.
+- Move less-frequent commands into an overflow menu.
 
-> [!TODO] Add a brief XAML example showing a two-column LOB layout (navigation + content) that collapses to a single column below a width threshold using `AdaptiveTrigger`. Validate with SME.
+See [Responsive design](../../design/layout/responsive-design.md).
 
-## Navigation patterns for LOB apps
-
-Most LOB apps use one of the following navigation patterns:
+## Choose navigation and commanding
 
 | Pattern | Control | Best for |
 |---|---|---|
-| Left navigation pane | `NavigationView` | Apps with 5–10 top-level sections; familiar to Windows users |
-| Tab bar | `TabView` | Apps where users work across multiple open records simultaneously |
-| Top-level menu | `MenuBar` | Enterprise apps with many modules, administrative features, or command-heavy workflows
+| App sections | `NavigationView` | A stable set of destinations or modules |
+| Multiple open records or documents | `TabView` | Work that benefits from several closable contexts |
+| A broad command hierarchy | `MenuBar` | Command-heavy desktop workflows |
 
-These patterns are not mutually exclusive. Many LOB applications combine them - for example, using a `NavigationView` to switch between modules and a `TabView` to work with multiple open records.
+These patterns can be combined. For example, use `NavigationView` for modules, `TabView` for open records, and `MenuBar` for commands that apply across the app. Avoid duplicating the same command in ways that make state or keyboard access inconsistent.
 
-For more information about each control, see:
-
-- [NavigationView](../../develop/ui/controls/navigationview.md) — the left navigation pane pattern
-- [TabView](../../develop/ui/controls/tab-view.md) — the tab bar pattern
-
-> [!TODO] SME: add guidance on choosing between `NavigationView`, `TabView` and `MenuBar` for LOB scenarios.
+- [NavigationView](../../develop/ui/controls/navigationview.md)
+- [TabView](../../develop/ui/controls/tab-view.md)
+- [Menus and menu bars](../../develop/ui/controls/menus.md)
 
 ## Get the sample
 
-The design showcase sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/04-DesignShowcase/` folder.
+The [design showcase sample](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/04-DesignShowcase) demonstrates `NavigationView`, Mica, theme-aware cards, and a settings page.
 
-The sample adapts to the system theme. The following screenshots show it running in the light and dark themes.
-
-:::image type="content" source="images/04-design-showcase.png" alt-text="The design showcase sample running in the light theme, showing a NavigationView with Mica backdrop and a dashboard of summary cards.":::
-
-:::image type="content" source="images/04-design-showcase-dark.png" alt-text="The design showcase sample running in the dark theme, showing a NavigationView with Mica backdrop and a dashboard of summary cards.":::
-
-> [!NOTE]
-> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
+:::image type="content" source="images/04-design-showcase-dark.png" alt-text="The dashboard sample running in the dark theme.":::
 
 ## Related content
 
-- [Build line-of-business apps with WinUI](index.md)
 - [Theming](../../develop/ui/theming.md)
-- [System backdrops (Mica and Acrylic)](../../develop/ui/system-backdrops.md)
+- [System backdrops](../../develop/ui/system-backdrops.md)
 - [Responsive design](../../design/layout/responsive-design.md)
 - [Accessibility overview](../../design/accessibility/accessibility-overview.md)
-- [Display tabular data in a WinUI app](display-tabular-data.md)
-- [LOB samples repo](https://github.com/GrantMeStrength/LOB) — see `04-DesignShowcase/` for a running example of Mica and light/dark theming

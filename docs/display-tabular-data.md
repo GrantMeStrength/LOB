@@ -1,101 +1,73 @@
 ---
 title: Display tabular data in a WinUI app
-description: Choose the right WinUI 3 control for tabular data with ListView and ItemsView, including trade-offs and when to use each option.
+description: Choose a WinUI 3 approach for displaying collections and tabular data with ListView, ItemsView, or a supported grid control.
 ms.topic: how-to
-ms.date: 07/29/2026
+ms.date: 08/31/2026
 author: GrantMeStrength
 ms.author: jken
 ---
 
 # Display tabular data in a WinUI app
 
-> [!NOTE]
-> This article is a **first-draft stub** for SME review. Sections marked `> [!TODO]` require technical validation before publication.
+Line-of-business apps often display records that users need to scan, select, filter, sort, or edit. WinUI 3 includes virtualizing collection controls, but it doesn't include a first-party DataGrid control.
 
-Most line-of-business apps need to display structured, tabular data — rows and columns of records that users can scan, sort, and select. WinUI 3 doesn't ship a first-party DataGrid control today. First-party support is in progress but not yet available, so use the built-in `ListView` and `ItemsView` controls with a columnar `DataTemplate` for now.
+:::image type="content" source="images/01-tabular-data-cards.png" alt-text="A WinUI 3 customer list with card-style rows that show name, company, region, and status.":::
 
-## Overview
+## Choose a control
 
-:::image type="content" source="images/01-tabular-data-cards.png" alt-text="The WinUI 3 tabular data sample showing a customer list in an ItemsView with card-style DataTemplates, displaying Name, Company, Region, and Status fields.":::
+| Requirement | Starting point |
+|---|---|
+| A list or card layout with custom item content | `ListView` or `ItemsView` |
+| A simple read-only table with a small, known set of columns | `ListView` or `ItemsView` with a columnar `DataTemplate` |
+| Column resizing, grouping, frozen columns, complex sorting, or spreadsheet-style editing | Evaluate a supported third-party grid control against your requirements |
 
-WinUI 3 offers the following built-in options for tabular or list-style data display:
+`ListView` is an established choice with selection and item-invocation behavior. `ItemsView` separates item presentation from layout and supports flexible layouts. Neither control is a drop-in DataGrid replacement. Choose based on the interactions and accessibility behavior your app requires.
 
-| Control | Source | Best for |
-|---|---|---|
-| `ListView` | WinUI 3 (inbox) | Single-column or simple multi-column lists; full template control |
-| `ItemsView` | WinUI 3 (inbox) | Modern successor to `ListView`; flexible layout via `ItemsLayout` |
+Don't use the older UWP Community Toolkit DataGrid in a WinUI 3 app.
 
-> [!IMPORTANT]
-> WinUI 3 doesn't include a first-party DataGrid control today. First-party DataGrid support is in progress but not yet available, so use `ListView` or `ItemsView` with a columnar `DataTemplate` for tabular data for now.
+## Bind the collection
 
-> [!TODO] SME review: update this article when first-party WinUI DataGrid support ships. Until then, keep the guidance on `ListView`/`ItemsView`.
+Expose a collection from your page or view model and set the binding mode explicitly:
 
-## When to use each option
-
-### ListView and ItemsView
-
-`ListView` and `ItemsView` are the built-in WinUI 3 controls for displaying collections of items. They are appropriate when:
-
-- Your data has a natural list or card shape (not strict row-column tabular data).
-- You need full control over item templates, including heterogeneous row heights or custom layouts.
-- Column alignment is not required (or can be achieved with a custom `DataTemplate` using a `Grid`).
-
-`ItemsView` is the recommended control for new code. It supports flexible layouts via the `ItemsLayout` property and is the direction of active WinUI investment.
-
-> [!TODO] SME validation: confirm that `ItemsView` is the recommended successor to `ListView` for new WinUI 3 apps as of the current stable Windows App SDK release. Confirm whether `ListView` is in maintenance mode or still actively developed.
-
-See [List views and grid views](../../develop/ui/controls/listview-and-gridview.md) for usage guidance.
-
-## What you'll build
-
-> [!TODO] Describe the sample app scenario (for example: an employee directory with sortable columns, a product catalog with inline editing, or a transaction log). Define this after the control recommendation is validated by SME.
-
-## Steps
-
-### 1. Choose your control
-
-Use the decision table in the [Overview](#overview) section to select the control that fits your data shape and interaction requirements.
-
-### 2. Prepare your data source
-
-Bind the control to an `ObservableCollection<T>` so the UI updates automatically when items are added, removed, or replaced.
-
-> [!TODO] Add a C# code example defining a simple model class and an `ObservableCollection<T>` exposed from a ViewModel. Validate with SME before publishing.
-
-### 3. Define columns
-
-To read as a table, columns must line up from row to row. Because each item's `DataTemplate` is laid out independently, a `Grid` that sizes its columns with `Auto` or `*` will produce different widths per row and the data won't align. Use **fixed** column widths — ideally shared values defined once as resources — in the item template's `Grid`, and add a matching header row above the list that uses the same widths.
-
-```xml
-<!-- Shared column widths, referenced by both the header and the item template -->
-<Page.Resources>
-    <x:Double x:Key="NameColWidth">200</x:Double>
-    <x:Double x:Key="RegionColWidth">120</x:Double>
-</Page.Resources>
+```csharp
+public ObservableCollection<Customer> Customers { get; } = new();
 ```
 
-> [!TODO] Add complete, SME-validated XAML for a `ListView`/`ItemsView` item `DataTemplate` and a matching header row that reference the shared column widths, and validate against the current stable Windows App SDK release.
+```xml
+<ItemsView
+    AutomationProperties.AutomationId="CustomerList"
+    ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
+    SelectionMode="Single">
+    <ItemsView.Layout>
+        <StackLayout Spacing="4" />
+    </ItemsView.Layout>
+</ItemsView>
+```
 
-### 4. Enable sorting
+Use `ObservableCollection<T>` when items are added or removed after the view loads. Implement property-change notification on an item when edits to that item must update the UI.
 
-> [!TODO] Describe how to implement column sorting for `ListView` and `ItemsView`, which requires a `CollectionViewSource` or custom sort logic. Validate with SME.
+## Align simple columns
 
-### 5. Handle selection and navigation
+Each item template is measured independently. `Auto` and proportional (`*`) columns can therefore produce different widths in different rows. For a simple table-like layout:
 
-> [!TODO] Describe how to respond to row selection (navigate to a detail view, open an edit dialog, etc.). Reference the [list/details pattern](../../develop/ui/controls/list-details.md) for the detail pane approach.
+1. Put a header above the collection.
+2. Use the same explicit widths for the header and each item template.
+3. Add text trimming and tooltips for values that can exceed their column.
+4. Test at different text scales and window widths.
+
+If the design needs user-resizable or dynamically sized columns, a purpose-built grid is a better fit than manually recreating those behaviors.
+
+## Add sorting and selection
+
+`ListView` and `ItemsView` don't automatically turn headers into sortable columns. Implement sorting in the data layer or view model, then update the bound collection or collection view. Preserve the selected record when applying a new order.
+
+Use selection for choosing a record and a separate command for destructive actions. Ensure each interactive element has an accessible name and keyboard behavior.
 
 ## Get the sample
 
-The tabular data sample is in the [LOB samples repo](https://github.com/GrantMeStrength/LOB) under the `WinUI-LOB-Samples/01-TabularData/` folder.
+The [tabular data sample](https://github.com/GrantMeStrength/LOB/tree/main/WinUI-LOB-Samples/01-TabularData) uses `ItemsView` and a card-style template. It demonstrates a responsive collection rather than a full grid.
 
-The sample adapts to the system theme. The following screenshots show it running in the light and dark themes.
-
-:::image type="content" source="images/01-tabular-data-cards.png" alt-text="The tabular data sample running in the light theme, showing a customer list in an ItemsView with card-style DataTemplates.":::
-
-:::image type="content" source="images/01-tabular-data-cards-dark.png" alt-text="The tabular data sample running in the dark theme, showing a customer list in an ItemsView with card-style DataTemplates.":::
-
-> [!NOTE]
-> The sample repo URL may change if the repo is renamed or moved; this article will be updated if that happens.
+:::image type="content" source="images/01-tabular-data-cards-dark.png" alt-text="The customer list sample running in the dark theme.":::
 
 ## Related content
 
