@@ -41,6 +41,30 @@ validation, task tracking, WinUI 3, etc.). Then invoke it by name or let it
 trigger on matching prompts. Restart your Copilot session after installing so the
 skill is picked up.
 
+## Real-world examples
+
+Concrete prompts a developer can paste into Copilot with this skill loaded. Each maps to a common LOB task.
+
+### Building UI
+
+- **Dashboard:** _"Using the Windows LOB XAML skill, build a WinUI 3 dashboard page with four KPI cards (Open Tickets, Overdue, Resolved Today, SLA %) in a responsive card grid that reflows on narrow widths. Use the shared status vocabulary for the Overdue card."_
+- **Filterable table:** _"Using the skill, create a customers table with an AutoSuggestBox search, removable filter chips for Region and Status, a '42 of 318' result count, and a Clear all button. Read-only ListView with a Grid-based row template."_
+- **Validated form:** _"Using the skill, generate a 'New invoice' form with Header labels, a NumberBox for amount, a required Customer ComboBox, blur-based validation, an InfoBar summary on submit, and Save enabled only when dirty and valid."_
+- **Task tracker:** _"Using the skill, build a task list grouped by status with glyph+label status chips, multi-select, and a contextual CommandBar (Complete, Assign, Delete) that appears only when items are selected. Confirm Delete in a ContentDialog."_
+- **Master-detail:** _"Using the skill, lay out a master-detail records screen that shows a list + detail pane on wide windows and collapses to single-column navigation under 640px."_
+
+### Reviewing existing XAML
+
+- **Design-system review:** _"Using the Windows LOB XAML skill, review MainPage.xaml and report theming, High Contrast, status-consistency, and accessibility issues with severity and line numbers."_
+- **PR review:** _"Using the skill, review the XAML changes in this diff and flag any WPF/UWP idioms, color-only status, or missing empty/loading/error states."_
+- **Accessibility pass:** _"Using the skill, check this page for missing AutomationProperties.Name on icon-only controls and any status conveyed by color alone."_
+
+### Migrating & fixing
+
+- **UWP → WinUI 3:** _"Using the skill, convert this UWP page to WinUI 3: update Windows.UI.Xaml namespaces to Microsoft.UI.Xaml and replace any Style.Triggers, DynamicResource, and Visibility=Hidden with WinUI 3 equivalents."_
+- **WPF DataGrid:** _"Using the skill, this WPF DataGrid needs to move to WinUI 3 — recommend the right control and show an editable-table replacement."_
+- **Status consistency fix:** _"Using the skill, extract a shared StatusToBrush/StatusToGlyph converter so status looks identical across the dashboard, table, and task list."_
+
 ## When it triggers
 
 LOB app, data grid, GridView/ListView, table, filter/sort/group, dashboard,
