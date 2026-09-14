@@ -47,19 +47,21 @@ Concrete prompts a developer can paste into Copilot with this skill loaded. Each
 
 ### Building UI
 
-You don't need to name the WinUI 3 primitives — state the goal and the skill applies the right patterns for you (responsive reflow, list virtualization, the shared status vocabulary, validation timing, adaptive layout).
+You don't need to name the WinUI 3 primitives — state the goal and the skill applies the right patterns for you (responsive reflow, list virtualization, the shared status vocabulary, type-specific validation, visual hierarchy, discoverable affordances, theme-from-system, adaptive layout).
 
-- **Dashboard:** _"Using the Windows LOB XAML skill, build a support dashboard showing Open Tickets, Overdue, Resolved Today, and SLA %."_ → skill lays out a card grid that reflows on narrow windows and styles the Overdue tile with the shared status vocabulary.
-- **Filterable table:** _"Using the skill, I need a customers screen where users can search and filter a few thousand records and see how many match."_ → skill adds search, removable filter chips, a result count, Clear all, and keeps the list virtualized.
-- **Validated form:** _"Using the skill, create a 'New invoice' form for customer, amount, and due date — Save should only work when the entry is valid."_ → skill picks the right inputs, validates on blur/submit (not per-keystroke), and gates Save on a dirty-and-valid ViewModel property.
-- **Task tracker:** _"Using the skill, build a task list where users can see each task's status at a glance, select several, and complete or reassign them together."_ → skill adds glyph+label status chips, multi-select, and a contextual bulk command bar with confirm-on-delete.
-- **Master-detail:** _"Using the skill, make a records screen with a list and a detail view that still works when the window is narrow."_ → skill builds an adaptive two-pane layout that collapses to single-column navigation.
+- **Dashboard:** _"Using the Windows LOB XAML skill, build a support dashboard showing Open Tickets, Overdue, Resolved Today, and SLA %."_ → skill lays out a card grid that reflows on narrow windows, styles the Overdue tile with the shared status vocabulary, and gives the most important metric visual prominence so the page leads the eye from summary toward detail (not a wall of identical cards).
+- **Filterable table:** _"Using the skill, I need a customers screen where users can search and filter a few thousand records and see how many match."_ → skill adds search, removable filter chips, a result count, Clear all, keeps the list virtualized, and makes sortable columns look sortable — a clear sort affordance, visually distinct from filters and command buttons.
+- **Validated form:** _"Using the skill, create a 'New invoice' form for customer, amount, and due date — Save should only work when the entry is valid."_ → skill picks inputs that match each field's data and validates by type (e.g. email, phone) on blur/submit (not per-keystroke), keeps optional fields optional while still validating any value entered, gates Save on a dirty-and-valid ViewModel, and reflows/scrolls as the window narrows instead of splitting a simple form into tabs.
+- **Task tracker:** _"Using the skill, build a task list where users can see each task's status at a glance, reorder tasks, sort them the way they actually work, and select several to complete or reassign together."_ → skill adds glyph+label status chips, multi-select, a contextual bulk command bar with confirm-on-delete, a visible grab handle so drag-to-reorder is discoverable, and sorting that separates done from not-done (not just by due date).
+- **Master-detail:** _"Using the skill, make a records screen with a list and a detail view that still works when the window is narrow."_ → skill builds an adaptive two-pane layout with sensible minimum widths that collapses to single-column navigation, so it doesn't break at the width the app first opens.
+- **Theme:** _"Using the skill, let users switch between light and dark, defaulting to their Windows theme."_ → skill initializes from the current system theme and places the override in Settings (not a prominent top-level toggle), verifying the UI in both Light and Dark.
+- **Multi-area app:** _"Using the skill, combine customer management and task tracking into one app rather than two separate pages."_ → skill brings them into a single NavigationView shell with global navigation across the related areas, instead of bolting navigation onto a single-purpose page.
 
 ### Reviewing existing XAML
 
-- **Design-system review:** _"Using the Windows LOB XAML skill, review MainPage.xaml and report theming, High Contrast, status-consistency, and accessibility issues with severity and line numbers."_
+- **Design-system review:** _"Using the Windows LOB XAML skill, review MainPage.xaml and report theming, High Contrast, status-consistency, discoverability of affordances (reorder handles, sortable headers), and accessibility issues with severity and line numbers."_
 - **PR review:** _"Using the skill, review the XAML changes in this diff and flag any WPF/UWP idioms, color-only status, or missing empty/loading/error states."_
-- **Accessibility pass:** _"Using the skill, check this page for missing AutomationProperties.Name on icon-only controls and any status conveyed by color alone."_
+- **Accessibility pass:** _"Using the skill, check this page for missing AutomationProperties.Name on icon-only controls, any status conveyed by color alone, and poor color contrast in every interactive state (selection, hover, filtered) — not just the default."_
 
 ### Migrating & fixing
 
