@@ -548,4 +548,4 @@ public partial class OrdersViewModel : ObservableObject
 
 ---
 
-*Distilled from the internal Windows Design XAML skill for third-party LOB developers. Full design system, shell surfaces, and 80+ component specs remain in the internal `windows-design-xaml` plugin. Questions: WinUXE@microsoft.com*
+*Focused WinUI 3 / Windows App SDK design guidance for line-of-business apps. For the full Windows Design System, see the official docs at [learn.microsoft.com/windows/apps/design](https://learn.microsoft.com/windows/apps/design/).*
