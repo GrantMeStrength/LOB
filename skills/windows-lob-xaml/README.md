@@ -47,11 +47,13 @@ Concrete prompts a developer can paste into Copilot with this skill loaded. Each
 
 ### Building UI
 
-- **Dashboard:** _"Using the Windows LOB XAML skill, build a WinUI 3 dashboard page with four KPI cards (Open Tickets, Overdue, Resolved Today, SLA %) in a responsive card grid that reflows on narrow widths. Use the shared status vocabulary for the Overdue card."_
-- **Filterable table:** _"Using the skill, create a customers table with an AutoSuggestBox search, removable filter chips for Region and Status, a '42 of 318' result count, and a Clear all button. Read-only ListView with a Grid-based row template."_
-- **Validated form:** _"Using the skill, generate a 'New invoice' form with Header labels, a NumberBox for amount, a required Customer ComboBox, blur-based validation, an InfoBar summary on submit, and Save enabled only when dirty and valid."_
-- **Task tracker:** _"Using the skill, build a task list grouped by status with glyph+label status chips, multi-select, and a contextual CommandBar (Complete, Assign, Delete) that appears only when items are selected. Confirm Delete in a ContentDialog."_
-- **Master-detail:** _"Using the skill, lay out a master-detail records screen that shows a list + detail pane on wide windows and collapses to single-column navigation under 640px."_
+You don't need to name the WinUI 3 primitives — state the goal and the skill applies the right patterns for you (responsive reflow, list virtualization, the shared status vocabulary, validation timing, adaptive layout).
+
+- **Dashboard:** _"Using the Windows LOB XAML skill, build a support dashboard showing Open Tickets, Overdue, Resolved Today, and SLA %."_ → skill lays out a card grid that reflows on narrow windows and styles the Overdue tile with the shared status vocabulary.
+- **Filterable table:** _"Using the skill, I need a customers screen where users can search and filter a few thousand records and see how many match."_ → skill adds search, removable filter chips, a result count, Clear all, and keeps the list virtualized.
+- **Validated form:** _"Using the skill, create a 'New invoice' form for customer, amount, and due date — Save should only work when the entry is valid."_ → skill picks the right inputs, validates on blur/submit (not per-keystroke), and gates Save on a dirty-and-valid ViewModel property.
+- **Task tracker:** _"Using the skill, build a task list where users can see each task's status at a glance, select several, and complete or reassign them together."_ → skill adds glyph+label status chips, multi-select, and a contextual bulk command bar with confirm-on-delete.
+- **Master-detail:** _"Using the skill, make a records screen with a list and a detail view that still works when the window is narrow."_ → skill builds an adaptive two-pane layout that collapses to single-column navigation.
 
 ### Reviewing existing XAML
 
