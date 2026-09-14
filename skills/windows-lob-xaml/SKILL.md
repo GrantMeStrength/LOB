@@ -1,11 +1,11 @@
 ---
 name: Windows LOB XAML Skill
-description: "Design and build data-dense line-of-business (LOB) apps in WinUI 3 / Windows App SDK. Focused on the surfaces LOB developers actually ship: data grids and tables, dashboards and metric cards, forms and data entry, task/status tracking, navigation shells, and enterprise compliance (theming, High Contrast, accessibility). Emphasizes usability, clarity, and consistency: one shared status vocabulary, filtering/sorting/grouping UX, validation timing, and consistent command placement. Ensures WinUI 3 / Windows App SDK APIs are used over WPF or UWP idioms. Use for GridView/ListView/DataGrid layout, virtualization, filtering and sorting, dashboards and tiles, chart integration, form validation, task tracking, master-detail, responsive breakpoints, x:Bind/MVVM for data binding, WPF-to-WinUI or UWP-to-WinUI migration, and design-system review. Triggers on: LOB app, business app, data grid, DataGrid, GridView, ListView, table, filter, sort, group, search, dashboard, metric card, KPI tile, chart, status, badge, chip, task tracking, bulk actions, form layout, form validation, required field, data entry, master detail, ListDetailsView, NavigationView, records, CRUD UI, admin panel, enterprise app, WinUI 3 data, x:Bind list, virtualization, empty state, WPF to WinUI, UWP to WinUI, Microsoft.UI.Xaml, WinUI XAML review, consistency, usability."
+description: "Design, build, and review data-dense line-of-business (LOB) apps in WinUI 3 / Windows App SDK: data grids and tables, dashboards and KPI cards, forms and validation, task/status tracking, filtering/sorting/grouping, and navigation shells — with usability, consistency, and enterprise compliance (theming, High Contrast, accessibility), favoring WinUI 3 APIs over WPF/UWP idioms. Triggers on: LOB app, data grid, ListView/GridView, WinUI.TableView, dashboard, KPI card, status chip, task tracking, bulk actions, form validation, master-detail, NavigationView, x:Bind/MVVM, virtualization, WPF/UWP-to-WinUI migration, WinUI XAML review."
 ---
 
 # WinUI 3 LOB XAML Guidance
 
-Design, build, and review **line-of-business (LOB)** interfaces in WinUI 3 / Windows App SDK. This skill distills the full Windows Design System down to the scenarios data-heavy business apps hit every day, and adds guidance the base design system leaves as patterns only (editable tables, dashboards, charts).
+Design, build, and review **line-of-business (LOB)** interfaces in WinUI 3 / Windows App SDK. This skill distills the Windows Design System to the scenarios data-heavy business apps hit daily, and adds guidance the base system leaves as patterns only (editable tables, dashboards, charts).
 
 > Scope: third-party LOB app developers. Shell/OS-internal surfaces (Taskbar, Start, command bars, shell resources) are intentionally out of scope.
 
@@ -29,7 +29,7 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 
 ## 0. Platform Guardrails — WinUI 3, not WPF or UWP
 
-**Always target WinUI 3 / Windows App SDK APIs.** LOB developers frequently migrate from WPF or UWP and carry over idioms that are wrong, missing, or renamed in WinUI 3. Catch these on sight in every mode.
+**Always target WinUI 3 / Windows App SDK APIs.** LOB developers migrating from WPF or UWP carry over idioms that are wrong or renamed in WinUI 3. Catch these on sight in every mode.
 
 ### Namespaces (the #1 tell)
 
@@ -54,11 +54,10 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 | Data provider | `ObjectDataProvider` | ViewModel property / async load |
 | Element naming in code | `FindName` gymnastics | `x:Name` + generated field; `{x:Bind}` |
 
-### Not available in WinUI 3 (don't reach for them)
+### Not available in WinUI 3 (beyond the table above)
 
-- `Trigger` / `DataTrigger` / `MultiTrigger` and `<Style.Triggers>` — none exist.
-- `Visibility.Hidden`, `MultiBinding`, `VisualBrush`, `OpacityMask`, `BitmapEffect`, `InkCanvas`-as-WPF, WPF `Window` chrome APIs.
-- WPF/UWP-only NuGet control libraries. **Do not add WPF control packages** (e.g. legacy WPF Toolkit DataGrid) to a WinUI 3 project — they won't load. Use WinUI 3-targeted packages only.
+- No `VisualBrush`, `OpacityMask`, `BitmapEffect`, WPF `InkCanvas`, or WPF `Window` chrome APIs.
+- **Don't add WPF/UWP-only control packages** (e.g. legacy WPF Toolkit DataGrid) — they won't load in WinUI 3. Use WinUI 3-targeted packages only.
 
 ### Dependencies & project shape
 
@@ -66,13 +65,13 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 - Third-party controls must target WinUI 3 / Windows App SDK (e.g. `WinUI.TableView`, `CommunityToolkit.WinUI.*`, `CommunityToolkit.Mvvm`). Verify the package explicitly supports WinUI 3 before recommending it.
 - When migrating UWP → WinUI 3, the mechanical first pass is `Windows.UI.Xaml` → `Microsoft.UI.Xaml` across XAML and C#, then fix the substitutions above.
 
-> In **Review** mode, flag any `System.Windows.*` / `Windows.UI.Xaml.*` reference, any `Style.Triggers`/`DataTrigger`, `DynamicResource`, `Visibility="Hidden"`, `MessageBox`, or `Dispatcher.Invoke` as a platform-correctness issue, not a style nit.
+> **Review mode:** treat any `System.Windows.*` / `Windows.UI.Xaml.*` reference, `Style.Triggers`/`DataTrigger`, `DynamicResource`, `Visibility="Hidden"`, `MessageBox`, or `Dispatcher.Invoke` as a platform-correctness issue, not a style nit.
 
 ---
 
 ## 0.5 Consistency & Clarity Doctrine (apply everywhere)
 
-LOB apps live or die on **usability, clarity, and consistency**. The rules below are cross-cutting: the *same* meaning must look and behave the *same* way across dashboards, tables, tasks, and forms. Reuse these — don't reinvent per screen.
+LOB apps live or die on **usability, clarity, and consistency**. These rules are cross-cutting: the *same* meaning must look and behave the *same* way across dashboards, tables, tasks, and forms. Reuse them — don't reinvent per screen.
 
 ### One status vocabulary (reuse across every surface)
 
@@ -126,7 +125,7 @@ The most common LOB surface. Pick the right control first — this is the decisi
 
 > **"Table" is a design pattern, not a control.** Do not hand-roll a table out of nested `Grid`s and `StackPanel`s for real tabular data — use a table control (editable) or `ListView` with a `Grid`-based `DataTemplate` (read-only).
 
-> ⚠️ **Do not use the Community Toolkit `DataGrid` for new WinUI 3 apps.** `CommunityToolkit.WinUI.UI.Controls.DataGrid` was **archived and did not move to Windows Community Toolkit v8** — it only survives in unmaintained **7.x** (UWP/Uno). For new work use **`WinUI.TableView`** (actively maintained, DataGrid-like API, purpose-built for WinUI 3 / Windows App SDK) or the earlier-stage **CommunityToolkit Labs `DataTable`** experiment. Verify the current package and API against its docs before shipping.
+> ⚠️ **Don't use the Community Toolkit `DataGrid` for new WinUI 3 apps.** It was archived and did **not** move to Windows Community Toolkit v8 (survives only in unmaintained 7.x for UWP/Uno). Use **`WinUI.TableView`** (maintained, DataGrid-like, built for WinUI 3) or the earlier-stage CommunityToolkit Labs `DataTable`. Verify the package against its docs before shipping.
 
 ### ListView / GridView essentials
 
@@ -178,7 +177,7 @@ Rules:
 
 ### Editable tables — WinUI.TableView
 
-For real editable, sortable, resizable tables, use **`WinUI.TableView`** (community-maintained; DataGrid-like API built for WinUI 3). Add the NuGet package `WinUI.TableView` and confirm the current API against its docs — it evolves.
+For editable, sortable, resizable tables, add the **`WinUI.TableView`** NuGet package (DataGrid-like API for WinUI 3); confirm the current API against its docs — it evolves.
 
 ```xml
 xmlns:tv="using:WinUI.TableView"
@@ -342,7 +341,7 @@ Whatever the choice: give the chart an **`AutomationProperties.Name`**, provide 
 
 ## 2.5 Task Tracking, Status & Bulk Actions
 
-Task/work-item tracking is a core LOB pattern the base design system leaves as a pattern only. Build it on a `ListView`/`WinUI.TableView` plus the shared **status vocabulary** from §0.5 — status must look identical here and on the dashboard.
+Task/work-item tracking is a core LOB pattern left as pattern-only by the base system. Build it on a `ListView`/`WinUI.TableView` plus the shared **status vocabulary** from §0.5 — status must look identical here and on the dashboard.
 
 ### Status chips & badges
 
