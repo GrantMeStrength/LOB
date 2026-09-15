@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -25,6 +26,7 @@ public partial class MainPageViewModel : ObservableObject
     // Completion toggles and task creation can overlap through async UI events.
     // Serialize SQLite mutations so the last visible state is the state persisted.
     private readonly SemaphoreSlim _mutationLock = new(1, 1);
+    private readonly Dictionary<int, bool> _persistedCompletion = new();
     private bool _isRestoringTaskState;
 
     /// <summary>The tasks shown in the UI, bound to an ItemsView.</summary>
@@ -90,10 +92,12 @@ public partial class MainPageViewModel : ObservableObject
             }
 
             Tasks.Clear();
+            _persistedCompletion.Clear();
             foreach (var item in items)
             {
                 item.PropertyChanged += OnTaskPropertyChanged;
                 Tasks.Add(item);
+                _persistedCompletion[item.Id] = item.IsComplete;
             }
 
             IsEmpty = Tasks.Count == 0;
@@ -148,20 +152,38 @@ public partial class MainPageViewModel : ObservableObject
             return;
         }
 
+        bool requestedValue = item.IsComplete;
         await _mutationLock.WaitAsync();
         try
         {
-            await _taskService.SetCompletionAsync(item.Id, item.IsComplete);
+            await _taskService.SetCompletionAsync(item.Id, requestedValue);
+            _persistedCompletion[item.Id] = requestedValue;
             OperationError = string.Empty;
         }
         catch (Exception ex) when (IsPersistenceException(ex))
         {
-            // Restore the visible value when persistence fails; otherwise the UI
-            // would claim success while the database still contains the old state.
-            _isRestoringTaskState = true;
-            item.IsComplete = !item.IsComplete;
-            _isRestoringTaskState = false;
-            OperationError = "The task update could not be saved. The previous value was restored.";
+            // A later click may have changed the checkbox while this write waited
+            // for the lock. Only roll back the value owned by this handler, and
+            // restore the last value confirmed by SQLite rather than guessing.
+            bool ownsCurrentValue = item.IsComplete == requestedValue;
+            bool hasPersistedValue = _persistedCompletion.TryGetValue(item.Id, out bool persistedValue);
+            bool restored = ownsCurrentValue && hasPersistedValue;
+            if (restored)
+            {
+                _isRestoringTaskState = true;
+                try
+                {
+                    item.IsComplete = persistedValue;
+                }
+                finally
+                {
+                    _isRestoringTaskState = false;
+                }
+            }
+
+            OperationError = restored
+                ? "The task update could not be saved. The last saved value was restored."
+                : "The task update could not be saved.";
         }
         finally
         {

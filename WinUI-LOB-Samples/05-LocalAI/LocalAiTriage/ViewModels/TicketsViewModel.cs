@@ -61,21 +61,26 @@ public sealed partial class TicketsViewModel : ObservableObject
     private async Task InitializeAsync()
     {
         IsLoading = true;
+        bool hasTickets = false;
+        bool loadFailed = false;
+        Tickets.Clear();
+        SelectedTicket = null;
         try
         {
             IReadOnlyList<SupportTicket> tickets = await _ticketData.GetTicketsAsync();
-            Tickets.Clear();
             foreach (SupportTicket ticket in tickets)
             {
                 Tickets.Add(ticket);
             }
 
+            hasTickets = Tickets.Count > 0;
             OperationError = Tickets.Count == 0
                 ? "No support tickets are available. Retry after the data source is populated."
                 : string.Empty;
         }
         catch (Exception ex) when (IsExpectedOperationError(ex))
         {
+            loadFailed = true;
             OperationError = $"Support tickets could not be loaded. {ex.Message}";
         }
         finally
@@ -83,11 +88,18 @@ public sealed partial class TicketsViewModel : ObservableObject
             IsLoading = false;
         }
 
-        if (Tickets.Count > 0)
+        if (hasTickets)
         {
             AiStatus status = await _textGeneration.EnsureReadyAsync();
             IsAiReady = status.IsReady;
             AiStatusMessage = status.Message;
+        }
+        else
+        {
+            IsAiReady = false;
+            AiStatusMessage = loadFailed
+                ? "Local AI was not checked because support tickets could not be loaded."
+                : "Local AI was not checked because no support tickets are available.";
         }
     }
 
