@@ -24,6 +24,10 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel MaxWidth="480" HorizontalAlignment="Left" Spacing="16">
 
+                <!--
+                    Visible headers keep labels available after input begins.
+                    Per-keystroke updates let validation and Save state respond immediately.
+                -->
                 <!--  Name (required)  -->
                 <StackPanel Spacing="4">
                     <TextBox
@@ -91,6 +95,7 @@
                     Style="{StaticResource AccentButtonStyle}"
                     Command="{x:Bind ViewModel.SaveCommand}" />
 
+                <!-- InfoBar confirms a non-blocking save without interrupting form flow. -->
                 <InfoBar
                     x:Name="SavedInfoBar"
                     AutomationProperties.AutomationId="SavedInfoBar"

@@ -21,7 +21,9 @@
                 Description="Choose the app theme."
                 Header="Theme">
                 <toolkit:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="&#xE790;" />
+                    <FontIcon
+                        AutomationProperties.AccessibilityView="Raw"
+                        Glyph="&#xE790;" />
                 </toolkit:SettingsCard.HeaderIcon>
                 <ToggleSwitch
                     AutomationProperties.AutomationId="ThemeToggleInSettings"

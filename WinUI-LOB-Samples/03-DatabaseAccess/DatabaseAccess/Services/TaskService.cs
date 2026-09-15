@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DatabaseAccess.Data;
@@ -57,10 +58,18 @@ public sealed class TaskService
         var existing = await db.Tasks.FindAsync(id).ConfigureAwait(false);
         if (existing is null)
         {
-            return;
+            throw new TaskNotFoundException(id);
         }
 
         existing.IsComplete = isComplete;
         await db.SaveChangesAsync().ConfigureAwait(false);
     });
+}
+
+public sealed class TaskNotFoundException : Exception
+{
+    public TaskNotFoundException(int taskId)
+        : base($"Task {taskId} no longer exists in the local database.")
+    {
+    }
 }

@@ -23,7 +23,7 @@ public sealed partial class MainPage : Page
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await ViewModel.InitializeAsync();
+        await ViewModel.InitializeCommand.ExecuteAsync(null);
     }
 
     /// <summary>Formats a due date for display in the task list.</summary>
@@ -37,4 +37,5 @@ public sealed partial class MainPage : Page
     /// <summary>Maps <c>true</c> to Collapsed, <c>false</c> to Visible.</summary>
     public static Visibility InvertBoolToVisibility(bool value) =>
         value ? Visibility.Collapsed : Visibility.Visible;
+
 }

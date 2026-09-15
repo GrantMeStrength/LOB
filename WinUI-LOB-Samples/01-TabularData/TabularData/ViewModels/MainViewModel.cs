@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace TabularData.ViewModels;
 
@@ -14,6 +16,8 @@ namespace TabularData.ViewModels;
 /// </summary>
 public sealed partial class MainViewModel : ObservableObject
 {
+    private readonly List<CustomerViewModel> _allCustomers = new();
+
     /// <summary>
     /// The single source of truth for both views.
     /// </summary>
@@ -21,6 +25,16 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ResultSummary))]
+    public partial string SearchText { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsEmpty { get; set; }
+
+    public string ResultSummary =>
+        $"{Customers.Count} customer{(Customers.Count == 1 ? string.Empty : "s")}";
 
     public MainViewModel()
     {
@@ -37,13 +51,44 @@ public sealed partial class MainViewModel : ObservableObject
 
         List<CustomerViewModel> generated = await Task.Run(GenerateCustomers);
 
-        foreach (CustomerViewModel customer in generated)
+        _allCustomers.Clear();
+        _allCustomers.AddRange(generated);
+        ApplyFilter();
+
+        IsLoading = false;
+    }
+
+    partial void OnSearchTextChanged(string value) => ApplyFilter();
+
+    [RelayCommand]
+    private void ClearSearch() => SearchText = string.Empty;
+
+    private void ApplyFilter()
+    {
+        // Both the card and table views bind to this same ObservableCollection.
+        // Mutating it keeps those bindings intact and demonstrates one filtered
+        // source of truth for multiple collection presentations.
+        IEnumerable<CustomerViewModel> filtered = _allCustomers;
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            string query = SearchText.Trim();
+            filtered = filtered.Where(customer =>
+                customer.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase)
+                || customer.Company.Contains(query, StringComparison.CurrentCultureIgnoreCase)
+                || customer.Region.Contains(query, StringComparison.CurrentCultureIgnoreCase)
+                || customer.Status.Contains(query, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        Customers.Clear();
+        foreach (CustomerViewModel customer in filtered)
         {
             Customers.Add(customer);
         }
 
-        IsLoading = false;
+        IsEmpty = Customers.Count == 0;
+        OnPropertyChanged(nameof(ResultSummary));
     }
+
     private static List<CustomerViewModel> GenerateCustomers()
     {
         string[] names =

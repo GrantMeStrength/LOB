@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Windows.AI;
 using Microsoft.Windows.AI.Text;
@@ -17,56 +19,63 @@ public sealed class PhiSilicaTextGenerationService : ITextGenerationService, IDi
     public async Task<AiStatus> EnsureReadyAsync()
     {
         AIFeatureReadyState state;
+        // Readiness and model creation are separate operations. Either can fail
+        // when the device, Windows version, capability, or access policy does
+        // not support the model, so both are converted into an explicit status.
         try
         {
             state = LanguageModel.GetReadyState();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsExpectedInitializationError(ex))
         {
             // The AI runtime is not present (for example, on a non-Copilot+ PC).
             return new AiStatus(false, $"Local AI is unavailable on this device. {ex.Message}");
         }
 
-        switch (state)
-        {
-            case AIFeatureReadyState.Ready:
-                break;
-
-            case AIFeatureReadyState.NotReady:
-                // The model needs to be downloaded/prepared. This can take a while
-                // on first run, so it is awaited off the UI thread by the caller.
-                await LanguageModel.EnsureReadyAsync();
-                if (LanguageModel.GetReadyState() != AIFeatureReadyState.Ready)
-                {
-                    return new AiStatus(false, "The local Phi Silica model could not be prepared on this device.");
-                }
-
-                break;
-
-            case AIFeatureReadyState.DisabledByUser:
-                return new AiStatus(false, "Local AI is turned off in Windows settings.");
-
-            case AIFeatureReadyState.NotSupportedOnCurrentSystem:
-            case AIFeatureReadyState.NotCompatibleWithSystemHardware:
-                return new AiStatus(false, "Local AI (Phi Silica) isn't supported by this device's current hardware and software configuration.");
-
-            case AIFeatureReadyState.OSUpdateNeeded:
-                return new AiStatus(false, "A Windows update is required before local AI can be used.");
-
-            case AIFeatureReadyState.CapabilityMissing:
-                return new AiStatus(false, "The Windows AI components required for local AI are not installed.");
-
-            default:
-                return new AiStatus(false, "Local AI is not available on this device.");
-        }
-
         try
         {
+            switch (state)
+            {
+                case AIFeatureReadyState.Ready:
+                    break;
+
+                case AIFeatureReadyState.NotReady:
+                    // The model needs to be downloaded/prepared. This can take a while
+                    // on first run, so it is awaited off the UI thread by the caller.
+                    await LanguageModel.EnsureReadyAsync();
+                    if (LanguageModel.GetReadyState() != AIFeatureReadyState.Ready)
+                    {
+                        return new AiStatus(false, "The local Phi Silica model could not be prepared on this device.");
+                    }
+
+                    break;
+
+                case AIFeatureReadyState.DisabledByUser:
+                    return new AiStatus(false, "Local AI is turned off in Windows settings.");
+
+                case AIFeatureReadyState.NotSupportedOnCurrentSystem:
+                case AIFeatureReadyState.NotCompatibleWithSystemHardware:
+                    return new AiStatus(false, "Local AI (Phi Silica) requires a Copilot+ PC with a compatible NPU.");
+
+                case AIFeatureReadyState.OSUpdateNeeded:
+                    return new AiStatus(false, "A Windows update is required before local AI can be used.");
+
+                case AIFeatureReadyState.CapabilityMissing:
+                    return new AiStatus(false, "The Windows AI components required for local AI are not installed.");
+
+                default:
+                    return new AiStatus(false, "Local AI is not available on this device.");
+            }
+
             _model ??= await LanguageModel.CreateAsync();
         }
         catch (Exception ex) when (IsAccessGatedError(ex))
         {
             return new AiStatus(false, LimitedAccessMessage);
+        }
+        catch (Exception ex) when (IsExpectedInitializationError(ex))
+        {
+            return new AiStatus(false, $"Local AI could not be prepared. {ex.Message}");
         }
 
         return new AiStatus(true, "Local Phi Silica model ready — running on-device.");
@@ -119,6 +128,9 @@ public sealed class PhiSilicaTextGenerationService : ITextGenerationService, IDi
             || ex.HResult == E_ACCESSDENIED
             || (ex.Message?.Contains("Limited Access Feature", StringComparison.OrdinalIgnoreCase) ?? false);
     }
+
+    private static bool IsExpectedInitializationError(Exception ex) =>
+        ex is COMException or IOException or InvalidOperationException or NotSupportedException;
 
     public void Dispose() => _model?.Dispose();
 }

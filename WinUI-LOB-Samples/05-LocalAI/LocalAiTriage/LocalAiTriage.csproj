@@ -13,6 +13,11 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!--
+      The sample is self-contained so running it does not depend on a matching
+      machine-wide .NET runtime. This is separate from its MSIX packaging mode.
+    -->
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>

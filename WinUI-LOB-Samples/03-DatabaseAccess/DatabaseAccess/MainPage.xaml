@@ -49,6 +49,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -96,8 +97,27 @@
                 Style="{StaticResource AccentButtonStyle}" />
         </Grid>
 
+        <!--
+            Persistence failures are contextual and recoverable, so an inline
+            InfoBar keeps the task list visible and offers a direct retry path.
+        -->
+        <InfoBar
+            Grid.Row="2"
+            IsClosable="False"
+            IsOpen="{x:Bind ViewModel.HasOperationError, Mode=OneWay}"
+            Message="{x:Bind ViewModel.OperationError, Mode=OneWay}"
+            Severity="Error"
+            Title="Local database error">
+            <InfoBar.ActionButton>
+                <Button
+                    AutomationProperties.AutomationId="RetryDatabaseButton"
+                    Command="{x:Bind ViewModel.InitializeCommand}"
+                    Content="Retry" />
+            </InfoBar.ActionButton>
+        </InfoBar>
+
         <!--  Task list  -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <ItemsView
                 AutomationProperties.AutomationId="TasksItemsView"
                 AutomationProperties.Name="Tasks"
@@ -113,6 +133,21 @@
                 Style="{StaticResource BodyTextBlockStyle}"
                 Text="No tasks yet. Add one above to get started."
                 Visibility="{x:Bind local:MainPage.BoolToVisibility(ViewModel.IsEmpty), Mode=OneWay}" />
+
+            <!-- Pair progress with text so loading is not communicated by motion alone. -->
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="8"
+                Visibility="{x:Bind local:MainPage.BoolToVisibility(ViewModel.IsBusy), Mode=OneWay}">
+                <ProgressRing
+                    Width="32"
+                    Height="32"
+                    IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Updating tasks…" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

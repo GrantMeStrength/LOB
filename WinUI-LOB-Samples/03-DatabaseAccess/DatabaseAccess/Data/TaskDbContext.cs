@@ -19,7 +19,10 @@ public sealed class TaskDbContext : DbContext
     /// <summary>
     /// Full path to the SQLite database file, rooted in LocalApplicationData.
     /// </summary>
-    public static string DatabasePath { get; } = BuildDatabasePath();
+    // Compute the path for each context instead of in a static initializer.
+    // A transient directory-access failure can then be surfaced and retried
+    // rather than permanently faulting the TaskDbContext type.
+    public static string DatabasePath => BuildDatabasePath();
 
     private static string BuildDatabasePath()
     {
