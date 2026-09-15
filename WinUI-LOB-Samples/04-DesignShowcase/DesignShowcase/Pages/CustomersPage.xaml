@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:DesignShowcase.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:DesignShowcase.Models"
     mc:Ignorable="d">
@@ -11,23 +12,36 @@
     <Grid Padding="24" RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Customers" />
 
-        <ItemsView
+        <!-- Search is promoted above the collection because finding a record is the primary task. -->
+        <AutoSuggestBox
             Grid.Row="1"
+            MaxWidth="520"
+            HorizontalAlignment="Stretch"
+            AutomationProperties.AutomationId="CustomerSearchBox"
+            Header="Search customers"
+            PlaceholderText="Name, company, or status"
+            QueryIcon="Find"
+            Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Grid Grid.Row="2">
+        <ItemsView
             AutomationProperties.AutomationId="CustomersList"
             AutomationProperties.Name="Customers list"
             ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            Visibility="{x:Bind local:CustomersPage.InvertBoolToVisibility(ViewModel.IsEmpty), Mode=OneWay}">
             <ItemsView.Layout>
                 <StackLayout Spacing="8" />
             </ItemsView.Layout>
             <ItemsView.ItemTemplate>
                 <DataTemplate x:DataType="models:Customer">
-                    <ItemContainer AutomationProperties.Name="{x:Bind Name}">
+                    <ItemContainer AutomationProperties.Name="{x:Bind Name, Mode=OneTime}">
                         <Grid
                             Padding="16,12"
                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -44,14 +58,14 @@
                             <PersonPicture
                                 Width="40"
                                 Height="40"
-                                Initials="{x:Bind Initials}" />
+                                Initials="{x:Bind Initials, Mode=OneTime}" />
 
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name, Mode=OneTime}" />
                                 <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="{x:Bind Company}" />
+                                    Text="{x:Bind Company, Mode=OneTime}" />
                             </StackPanel>
 
                             <Border
@@ -62,12 +76,34 @@
                                 BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
                                 BorderThickness="1"
                                 CornerRadius="{StaticResource ControlCornerRadius}">
-                                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Status}" />
+                                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Status, Mode=OneTime}" />
                             </Border>
                         </Grid>
                     </ItemContainer>
                 </DataTemplate>
             </ItemsView.ItemTemplate>
         </ItemsView>
+            <!-- Keep no-results guidance inside the collection region and provide recovery. -->
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="8"
+                Visibility="{x:Bind local:CustomersPage.BoolToVisibility(ViewModel.IsEmpty), Mode=OneWay}">
+                <FontIcon
+                    FontSize="32"
+                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                    Glyph="&#xE721;" />
+                <TextBlock
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="No matching customers" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Clear the search or try a broader term." />
+                <Button
+                    AutomationProperties.AutomationId="ClearCustomerSearchButton"
+                    Command="{x:Bind ViewModel.ClearSearchCommand}"
+                    Content="Clear search" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

@@ -37,6 +37,9 @@ public sealed partial class MainPage : Page
     public InfoBarSeverity StatusSeverity(bool isReady) =>
         isReady ? InfoBarSeverity.Success : InfoBarSeverity.Warning;
 
+    public static Visibility BoolToVisibility(bool value) =>
+        value ? Visibility.Visible : Visibility.Collapsed;
+
     private async void OnLoaded(object sender, RoutedEventArgs e) =>
         await ViewModel.InitializeCommand.ExecuteAsync(null);
 

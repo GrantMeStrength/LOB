@@ -12,7 +12,7 @@
     <Page.Resources>
         <!-- Part A: card template rendered by the ItemsView. -->
         <DataTemplate x:Key="CustomerCardTemplate" x:DataType="vm:CustomerViewModel">
-            <ItemContainer AutomationProperties.Name="{x:Bind Name}">
+            <ItemContainer AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
                 <Border
                     Padding="16"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -20,17 +20,17 @@
                     BorderThickness="1"
                     CornerRadius="{StaticResource ControlCornerRadius}">
                     <StackPanel Spacing="4">
-                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Name}" />
+                        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Name, Mode=OneWay}" />
                         <TextBlock
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource BodyStrongTextBlockStyle}"
-                            Text="{x:Bind Company}" />
+                            Text="{x:Bind Company, Mode=OneWay}" />
                         <StackPanel
                             Margin="0,8,0,0"
                             Orientation="Horizontal"
                             Spacing="8">
                             <FontIcon FontSize="14" Glyph="&#xE707;" />
-                            <TextBlock Text="{x:Bind Region}" />
+                            <TextBlock Text="{x:Bind Region, Mode=OneWay}" />
                         </StackPanel>
                         <Border
                             Margin="0,8,0,0"
@@ -41,7 +41,7 @@
                             <TextBlock
                                 Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
-                                Text="{x:Bind Status}" />
+                                Text="{x:Bind Status, Mode=OneWay}" />
                         </Border>
                     </StackPanel>
                 </Border>
@@ -56,16 +56,17 @@
                     <ColumnDefinition Width="120" />
                     <ColumnDefinition Width="120" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{x:Bind Name}" />
-                <TextBlock Grid.Column="1" Text="{x:Bind Company}" />
-                <TextBlock Grid.Column="2" Text="{x:Bind Region}" />
-                <TextBlock Grid.Column="3" Text="{x:Bind Status}" />
+                <TextBlock Text="{x:Bind Name, Mode=OneWay}" />
+                <TextBlock Grid.Column="1" Text="{x:Bind Company, Mode=OneWay}" />
+                <TextBlock Grid.Column="2" Text="{x:Bind Region, Mode=OneWay}" />
+                <TextBlock Grid.Column="3" Text="{x:Bind Status, Mode=OneWay}" />
             </Grid>
         </DataTemplate>
     </Page.Resources>
 
     <Grid Padding="24" RowSpacing="16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -78,7 +79,41 @@
                 Text="The same 20 records shown as cards and as a columnar table." />
         </StackPanel>
 
-        <Pivot Grid.Row="1">
+        <!--
+            LOB users often know the record they need. Update the ViewModel on
+            each keystroke so both collection presentations filter together.
+        -->
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <AutoSuggestBox
+                AutomationProperties.AutomationId="CustomerSearchBox"
+                Header="Search customers"
+                PlaceholderText="Name, company, region, or status"
+                QueryIcon="Find"
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <!-- A zero-result state explains what happened and provides recovery. -->
+            <StackPanel
+                Grid.Column="1"
+                VerticalAlignment="Bottom"
+                Orientation="Horizontal"
+                Spacing="8">
+                <ProgressRing
+                    Width="16"
+                    Height="16"
+                    IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{x:Bind ViewModel.ResultSummary, Mode=OneWay}" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2">
+        <Pivot Visibility="{x:Bind local:MainPage.InvertBoolToVisibility(ViewModel.IsEmpty), Mode=OneWay}">
             <PivotItem Header="Cards">
                 <ItemsView
                     x:Name="CardsView"
@@ -125,5 +160,27 @@
                 </StackPanel>
             </PivotItem>
         </Pivot>
+
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="8"
+                Visibility="{x:Bind local:MainPage.BoolToVisibility(ViewModel.IsEmpty), Mode=OneWay}">
+                <FontIcon
+                    FontSize="32"
+                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                    Glyph="&#xE721;" />
+                <TextBlock
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="No matching customers" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Clear the search or try a broader term." />
+                <Button
+                    AutomationProperties.AutomationId="ClearCustomerSearchButton"
+                    Command="{x:Bind ViewModel.ClearSearchCommand}"
+                    Content="Clear search" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

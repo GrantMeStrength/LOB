@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,24 +14,27 @@ public partial class NewCustomerViewModel : ObservableValidator
 {
     private readonly RelayCommand _saveCommand;
 
+    // Partial observable properties are the CommunityToolkit.Mvvm pattern that
+    // allows WinUI's source generators to preserve validation metadata and
+    // remain compatible with Native AOT scenarios.
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Name is required.")]
-    private string _name = string.Empty;
+    public partial string Name { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Email is required.")]
     [EmailAddress(ErrorMessage = "Enter a valid email address.")]
-    private string _email = string.Empty;
+    public partial string Email { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _phone = string.Empty;
+    public partial string Phone { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [Required(ErrorMessage = "Region is required.")]
-    private string? _region;
+    public partial string? Region { get; set; }
 
     private string _statusMessage = string.Empty;
     private bool _isStatusOpen;

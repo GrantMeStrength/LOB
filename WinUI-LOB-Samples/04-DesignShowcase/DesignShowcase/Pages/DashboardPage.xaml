@@ -38,7 +38,7 @@
             </ItemsView.Layout>
             <ItemsView.ItemTemplate>
                 <DataTemplate x:DataType="models:SummaryCard">
-                    <ItemContainer AutomationProperties.Name="{x:Bind Title}">
+                    <ItemContainer AutomationProperties.Name="{x:Bind Title, Mode=OneTime}">
                         <Border
                             Padding="20"
                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -50,12 +50,12 @@
                                     HorizontalAlignment="Left"
                                     FontSize="24"
                                     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                    Glyph="{x:Bind Glyph}" />
+                                    Glyph="{x:Bind Glyph, Mode=OneTime}" />
                                 <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="{x:Bind Title}" />
-                                <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}" Text="{x:Bind Value}" />
+                                    Text="{x:Bind Title, Mode=OneTime}" />
+                                <TextBlock Style="{StaticResource TitleLargeTextBlockStyle}" Text="{x:Bind Value, Mode=OneTime}" />
                             </StackPanel>
                         </Border>
                     </ItemContainer>

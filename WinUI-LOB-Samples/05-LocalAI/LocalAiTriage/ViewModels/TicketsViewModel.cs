@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -46,6 +48,14 @@ public sealed partial class TicketsViewModel : ObservableObject
     [ObservableProperty]
     public partial string AiStatusMessage { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOperationError))]
+    public partial string OperationError { get; set; } = string.Empty;
+
+    // Keep ticket/data failures separate from AI availability. They have
+    // different recovery paths and should not share one generic status message.
+    public bool HasOperationError => !string.IsNullOrWhiteSpace(OperationError);
+
     /// <summary>Loads tickets and prepares the local model when the page opens.</summary>
     [RelayCommand]
     private async Task InitializeAsync()
@@ -59,15 +69,26 @@ public sealed partial class TicketsViewModel : ObservableObject
             {
                 Tickets.Add(ticket);
             }
+
+            OperationError = Tickets.Count == 0
+                ? "No support tickets are available. Retry after the data source is populated."
+                : string.Empty;
+        }
+        catch (Exception ex) when (IsExpectedOperationError(ex))
+        {
+            OperationError = $"Support tickets could not be loaded. {ex.Message}";
         }
         finally
         {
             IsLoading = false;
         }
 
-        AiStatus status = await _textGeneration.EnsureReadyAsync();
-        IsAiReady = status.IsReady;
-        AiStatusMessage = status.Message;
+        if (Tickets.Count > 0)
+        {
+            AiStatus status = await _textGeneration.EnsureReadyAsync();
+            IsAiReady = status.IsReady;
+            AiStatusMessage = status.Message;
+        }
     }
 
     private bool CanTriage() => IsAiReady && SelectedTicket is { IsProcessing: false };
@@ -83,6 +104,7 @@ public sealed partial class TicketsViewModel : ObservableObject
         }
 
         ticket.IsProcessing = true;
+        OperationError = string.Empty;
         TriageSelectedCommand.NotifyCanExecuteChanged();
         try
         {
@@ -99,9 +121,11 @@ public sealed partial class TicketsViewModel : ObservableObject
             ticket.Summary = null;
             ticket.Category = null;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (IsExpectedOperationError(ex))
         {
-            ticket.Summary = $"Triage failed: {ex.Message}";
+            ticket.Summary = null;
+            ticket.Category = null;
+            OperationError = $"The selected ticket could not be triaged. {ex.Message}";
         }
         finally
         {
@@ -120,4 +144,7 @@ public sealed partial class TicketsViewModel : ObservableObject
         + string.Join(", ", Categories)
         + ". Reply with only the category name and nothing else.\n\n"
         + $"Ticket:\n{ticket.Body}";
+
+    private static bool IsExpectedOperationError(Exception ex) =>
+        ex is COMException or IOException or InvalidOperationException or NotSupportedException;
 }

@@ -40,9 +40,11 @@
             </TitleBar.RightHeader>
         </TitleBar>
 
+        <!-- NavigationView supplies the expected keyboard, focus, and adaptive pane behavior. -->
         <NavigationView
             x:Name="NavView"
             Grid.Row="1"
+            AutomationProperties.AutomationId="PrimaryNavigation"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleButtonVisible="False"
             IsSettingsVisible="True"

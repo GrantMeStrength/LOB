@@ -1,11 +1,15 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DatabaseAccess.Models;
 using DatabaseAccess.Services;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 namespace DatabaseAccess.ViewModels;
 
@@ -18,6 +22,10 @@ namespace DatabaseAccess.ViewModels;
 public partial class MainPageViewModel : ObservableObject
 {
     private readonly TaskService _taskService = new();
+    // Completion toggles and task creation can overlap through async UI events.
+    // Serialize SQLite mutations so the last visible state is the state persisted.
+    private readonly SemaphoreSlim _mutationLock = new(1, 1);
+    private bool _isRestoringTaskState;
 
     /// <summary>The tasks shown in the UI, bound to an ItemsView.</summary>
     public ObservableCollection<TaskItem> Tasks { get; } = new();
@@ -33,19 +41,40 @@ public partial class MainPageViewModel : ObservableObject
 
     /// <summary>True while a load/save operation is in flight.</summary>
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AddTaskCommand))]
     public partial bool IsBusy { get; set; }
 
     /// <summary>True when there are no tasks to show.</summary>
     [ObservableProperty]
     public partial bool IsEmpty { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOperationError))]
+    public partial string OperationError { get; set; } = string.Empty;
+
+    public bool HasOperationError => !string.IsNullOrWhiteSpace(OperationError);
+
     /// <summary>
     /// Ensures the database exists and loads the initial task list.
     /// </summary>
+    [RelayCommand]
     public async Task InitializeAsync()
     {
-        await _taskService.InitializeAsync();
-        await LoadTasksAsync();
+        IsBusy = true;
+        try
+        {
+            await _taskService.InitializeAsync();
+            await LoadTasksAsync();
+            OperationError = string.Empty;
+        }
+        catch (Exception ex) when (IsPersistenceException(ex))
+        {
+            OperationError = "Tasks could not be loaded from the local database. Check storage access, then retry.";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task LoadTasksAsync()
@@ -75,12 +104,13 @@ public partial class MainPageViewModel : ObservableObject
         }
     }
 
-    private bool CanAddTask() => !string.IsNullOrWhiteSpace(NewTaskTitle);
+    private bool CanAddTask() => !IsBusy && !string.IsNullOrWhiteSpace(NewTaskTitle);
 
     [RelayCommand(CanExecute = nameof(CanAddTask))]
     private async Task AddTaskAsync()
     {
         IsBusy = true;
+        await _mutationLock.WaitAsync();
         try
         {
             var item = new TaskItem
@@ -96,21 +126,53 @@ public partial class MainPageViewModel : ObservableObject
             NewTaskTitle = string.Empty;
             NewTaskDueDate = DateTimeOffset.Now;
             await LoadTasksAsync();
+            OperationError = string.Empty;
+        }
+        catch (Exception ex) when (IsPersistenceException(ex))
+        {
+            OperationError = "The new task could not be saved to the local database.";
         }
         finally
         {
+            _mutationLock.Release();
             IsBusy = false;
         }
     }
 
     private async void OnTaskPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender is not TaskItem item || e.PropertyName != nameof(TaskItem.IsComplete))
+        if (_isRestoringTaskState
+            || sender is not TaskItem item
+            || e.PropertyName != nameof(TaskItem.IsComplete))
         {
             return;
         }
 
-        // Persist the toggled completion state immediately.
-        await _taskService.SetCompletionAsync(item.Id, item.IsComplete);
+        await _mutationLock.WaitAsync();
+        try
+        {
+            await _taskService.SetCompletionAsync(item.Id, item.IsComplete);
+            OperationError = string.Empty;
+        }
+        catch (Exception ex) when (IsPersistenceException(ex))
+        {
+            // Restore the visible value when persistence fails; otherwise the UI
+            // would claim success while the database still contains the old state.
+            _isRestoringTaskState = true;
+            item.IsComplete = !item.IsComplete;
+            _isRestoringTaskState = false;
+            OperationError = "The task update could not be saved. The previous value was restored.";
+        }
+        finally
+        {
+            _mutationLock.Release();
+        }
     }
+
+    private static bool IsPersistenceException(Exception exception) =>
+        exception is IOException
+            or UnauthorizedAccessException
+            or SqliteException
+            or DbUpdateException
+            or TaskNotFoundException;
 }

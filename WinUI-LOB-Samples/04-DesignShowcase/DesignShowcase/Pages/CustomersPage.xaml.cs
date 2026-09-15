@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using DesignShowcase.ViewModels;
 
@@ -11,4 +12,10 @@ public sealed partial class CustomersPage : Page
     }
 
     public CustomersViewModel ViewModel { get; } = new();
+
+    public static Visibility BoolToVisibility(bool value) =>
+        value ? Visibility.Visible : Visibility.Collapsed;
+
+    public static Visibility InvertBoolToVisibility(bool value) =>
+        value ? Visibility.Collapsed : Visibility.Visible;
 }

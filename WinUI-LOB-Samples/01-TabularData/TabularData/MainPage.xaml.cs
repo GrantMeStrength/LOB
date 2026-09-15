@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TabularData.ViewModels;
 
@@ -18,4 +19,10 @@ public sealed partial class MainPage : Page
     {
         InitializeComponent();
     }
+
+    public static Visibility BoolToVisibility(bool value) =>
+        value ? Visibility.Visible : Visibility.Collapsed;
+
+    public static Visibility InvertBoolToVisibility(bool value) =>
+        value ? Visibility.Collapsed : Visibility.Visible;
 }
