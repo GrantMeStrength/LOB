@@ -9,8 +9,8 @@ namespace LocalAiTriage.Services;
 
 /// <summary>
 /// On-device text generation backed by the Phi Silica small language model in
-/// the Windows App SDK. All work runs locally on the NPU of a Copilot+ PC — no
-/// data leaves the device and no network connection is required.
+/// the Windows App SDK. All work runs on supported local hardware, so no data
+/// leaves the device and no network connection is required for generation.
 /// </summary>
 public sealed class PhiSilicaTextGenerationService : ITextGenerationService, IDisposable
 {
@@ -40,6 +40,8 @@ public sealed class PhiSilicaTextGenerationService : ITextGenerationService, IDi
                     break;
 
                 case AIFeatureReadyState.NotReady:
+                    // The model needs to be downloaded/prepared. This can take a while
+                    // on first run, so it is awaited off the UI thread by the caller.
                     await LanguageModel.EnsureReadyAsync();
                     if (LanguageModel.GetReadyState() != AIFeatureReadyState.Ready)
                     {

@@ -1,21 +1,27 @@
-# WinUI LOB docs index
+# WinUI LOB documentation review mirror
 
-The published Learn articles are the source of truth for this sample set:
-https://learn.microsoft.com/windows/apps/get-started/line-of-business/
+This folder mirrors the publication candidate in [MicrosoftDocs/windows-dev-docs-pr#7160](https://github.com/MicrosoftDocs/windows-dev-docs-pr/pull/7160). It exists so external reviewers can comment on the content before it is published.
 
-> [!NOTE]
-> This repo intentionally keeps only a short index here to avoid drift from the Learn copy. The per-topic markdown mirror was removed.
->
-> [!TODO]
-> Confirm the final article slugs once PR #7160 is published; until then, the titles below are listed without direct links.
+The candidate no longer contains draft markers or unresolved review callouts. SME feedback from the pull request has been incorporated, including guidance about DataGrid, validation, control density, Windows Runtime APIs, theme brushes, materials, and Windows AI prerequisites.
 
-| Sample | Learn article |
+## Articles
+
+- [Build line-of-business apps with WinUI - overview](index.md)
+- [Display tabular data in a WinUI app](display-tabular-data.md)
+- [Build a data-entry form with validation in WinUI 3](build-validated-form.md)
+- [Connect a WinUI app to a database](connect-to-a-database.md)
+- [Design for productivity in WinUI LOB apps](design-for-lob.md)
+- [Add AI capabilities to a line-of-business WinUI app](ai-for-lob-apps.md)
+- [Windows Forms patterns and their WinUI 3 equivalents](migrate-winforms-patterns.md)
+
+## Sample map
+
+| Article | Sample |
 |---|---|
-| `WinUI-LOB-Samples/01-TabularData/` | Display tabular data in a WinUI app |
-| `WinUI-LOB-Samples/02-ValidatedForm/` | Build a data-entry form with validation |
-| `WinUI-LOB-Samples/03-DatabaseAccess/` | Connect a WinUI app to a database |
-| `WinUI-LOB-Samples/04-DesignShowcase/` | Design for productivity in WinUI LOB apps |
-| `WinUI-LOB-Samples/05-LocalAI/` | Add AI capabilities to a line-of-business WinUI app |
+| Display tabular data | [`01-TabularData`](../WinUI-LOB-Samples/01-TabularData) |
+| Build a validated form | [`02-ValidatedForm`](../WinUI-LOB-Samples/02-ValidatedForm) |
+| Connect to a database | [`03-DatabaseAccess`](../WinUI-LOB-Samples/03-DatabaseAccess) |
+| Design for productivity | [`04-DesignShowcase`](../WinUI-LOB-Samples/04-DesignShowcase) |
+| Add AI capabilities | [`05-LocalAI`](../WinUI-LOB-Samples/05-LocalAI) |
 
-> [!TODO]
-> If you need a live article URL, confirm the published slug first rather than guessing it.
+After publication, use the corresponding Microsoft Learn articles as the authoritative content.

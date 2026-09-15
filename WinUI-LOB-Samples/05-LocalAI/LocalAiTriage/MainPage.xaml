@@ -80,6 +80,7 @@
 
                     <ItemsView
                         x:Name="TicketsList"
+                        AutomationProperties.AutomationId="TicketsList"
                         Padding="8"
                         AutomationProperties.AutomationId="TicketsList"
                         AutomationProperties.Name="Support tickets"
