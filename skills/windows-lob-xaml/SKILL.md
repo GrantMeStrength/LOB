@@ -111,9 +111,18 @@ Pick one semantic system and use it everywhere a status appears (KPI tiles, tabl
 ### Formatting & scannability discipline
 
 - **Right-align numbers, currency, and dates** in tables; left-align text. Align decimal points for comparison.
+- **Match each column header to its cells.** A left-aligned heading needs left-aligned cells, a right-aligned numeric heading needs right-aligned values, and a centered heading needs centered cells. Don't center an entire table by default; choose alignment by the data's meaning and keep it consistent down the column.
 - Format with the **current culture** (`{x:Bind Amount, Converter=...}` or ViewModel-formatted strings) — one date format and one currency format across the app; ties into localization.
 - Use **tabular figures** and consistent precision (don't mix `1,200` and `1200.00`).
 - Emphasize the value, de-emphasize the label: value in `BodyStrong`/`Title`, label in `Caption` + `TextFillColorSecondaryBrush`.
+
+### Alignment & content bounds
+
+- Establish one page content gutter and align page titles, section headings, command surfaces, cards, forms, and tables to it. Misaligned left or right edges make dense LOB screens look accidental.
+- **Edge-to-edge must be deliberate.** Selection backgrounds, data grids, and media can extend across their container when the design calls for it; text, forms, and card contents normally retain an inset. Look for missing `Padding`, unwanted `HorizontalAlignment="Stretch"`, and containers that erase the page gutter.
+- A list or table row can use a full-width hover/selection surface while its inner content stays aligned to the page or column inset.
+- Prefer shared container padding and grid columns over unrelated per-control margins. Check both edges of adjacent sections, not only the leading edge.
+- Review alignment at the initial window size and at narrow widths. A layout that aligns only when maximized is not complete.
 
 ---
 
@@ -205,6 +214,8 @@ xmlns:tv="using:WinUI.TableView"
 
 - Column `Binding` uses classic `{Binding}` (like WCT/WPF grids), not `{x:Bind}`.
 - Prefer **`*`/`Auto` column widths** so the table reflows; avoid fixed pixel widths.
+- Set header and cell alignment as one column-level decision. Text columns are normally left-aligned, numeric/date columns right-aligned, and compact state/icon columns may be centered. If a design centers the heading, center the cells beneath it too.
+- Keep the same alignment in read, edit, loading, and empty states; editors such as `TextBox`, `NumberBox`, and `ComboBox` must not jump to a different horizontal alignment.
 - Verify **High Contrast** rendering (headers, gridlines, selection) and keyboard navigation — third-party table controls sometimes lag on both.
 - **Migrating from WCT DataGrid?** `WinUI.TableView` publishes a migration guide; most `DataGrid*` column types map to `TableView*` equivalents.
 - **Alternative:** CommunityToolkit Labs **`DataTable`** (with `ItemsRepeater`) is a lighter, earlier-stage option if you only need display + basic layout, not full editing.
@@ -242,7 +253,9 @@ Every LOB collection needs three non-happy-path states. Overlay them on the same
 LOB users expect to filter the *same* table many ways at once. Back it with a **`CollectionViewSource`** (grouping/current-item) or an observable filtered collection in the ViewModel — never rebuild the list in code-behind on every keystroke.
 
 - **Search** → `AutoSuggestBox` at the top of the list (`QuerySubmitted`/`TextChanged`, debounced). It is the standard LOB search affordance.
-- **Column / faceted filters** → filter chips or dropdowns; represent active filters as removable tokens so the user can see and clear each one.
+- **Column / faceted filters** → filter chips or standard WinUI dropdown controls; represent active filters as removable tokens so the user can see and clear each one.
+- Use the library control that matches the interaction: **`ComboBox`** for choose-one values, **`DropDownButton`** or **`MenuFlyout`** for a command menu, and **`AutoSuggestBox`** for searchable suggestions. Do not hand-roll a dropdown from `Popup`, `Border`, and pointer handlers when a WinUI control can provide keyboard behavior, focus, automation, theming, and High Contrast states.
+- Customize a dropdown template only when a documented requirement cannot be met by the built-in controls, and preserve all default interaction and accessibility states.
 - **Combine** search + filters + sort + group: they are ANDed against one view, not separate lists.
 - **Always show the result count** ("42 of 318") and a **Clear all** affordance when any filter is active.
 - **Sorting**: `WinUI.TableView` sorts columns for you; for `ListView`, sort in the VM and reflect direction with a header glyph (`&#xE8CB;` Sort, or chevrons `&#xE70E;`/`&#xE70D;`). Offer sorts that match the user's real task, not just the most obvious field — e.g. a task list usually needs to separate done from not-done, not only sort by due date.
@@ -395,8 +408,10 @@ Task/work-item tracking is a core LOB pattern left as pattern-only by the base s
 
 - **One `Grid`, margins on children** — not nested `StackPanel`s with `Spacing`. Two columns: labels `Auto`, fields `*`, or stacked label-over-field for narrow widths.
 - **Stay usable as the window narrows**: reflow to a single stacked column and/or scroll — **don't split a simple form into tabs** just to save space. Choose scrolling vs. restructuring based on the actual content, not a fixed width.
+- Give the page or panel one clear vertical scroll owner. Avoid nesting a form `ScrollViewer` inside another scrolling container; nested scrolling commonly traps wheel, touch, and keyboard input.
+- When text sits inside a card, table cell, expander, dialog, or other container, verify `TextWrapping`, available height, and the container's scroll behavior together. Long text must wrap or remain reachable by scrolling instead of clipping behind a fixed-height parent.
 - Use each control's built-in **`Header`** (`TextBox`, `NumberBox`, `ComboBox`, `DatePicker`, `ToggleSwitch`) instead of a separate label `TextBlock`.
-- Pick the right input control: **`NumberBox`** (numeric, with spin/validation), **`DatePicker`/`CalendarDatePicker`** (dates), **`ComboBox`** (choose-one), **`ToggleSwitch`** (on/off), **`AutoSuggestBox`** (search/typeahead).
+- Pick the right input control: **`NumberBox`** (numeric, with spin/validation), **`DatePicker`/`CalendarDatePicker`** (dates), **`ComboBox`** (choose-one), **`ToggleSwitch`** (on/off), **`AutoSuggestBox`** (search/typeahead). Prefer these library controls over custom equivalents.
 
 ```xml
 <Grid ColumnSpacing="16" RowSpacing="12">
@@ -489,6 +504,7 @@ Enterprise and government LOB apps are frequently **held to accessibility and th
 - HighContrast dictionaries use **only the 8 system color brushes**: `SystemColorWindowTextColorBrush`, `SystemColorWindowColorBrush`, `SystemColorHighlightTextColorBrush`, `SystemColorHighlightColorBrush`, `SystemColorButtonTextColorBrush`, `SystemColorButtonFaceColorBrush`, `SystemColorGrayTextColorBrush`, `SystemColorHotlightColorBrush`.
 - No hardcoded colors, opacity, accent, gradients, or animations in HC. Empty HC dictionary (`<ResourceDictionary x:Key="HighContrast" />`) is valid when WinUI defaults suffice.
 - Use **2px** borders in HC for dialogs, flyouts, and cards. Set `HighContrastAdjustment = None` once at app level.
+- Verify High Contrast at runtime, including table headers/cells, selection, hover, focus, dropdown open states, validation, disabled content, and icons. Every foreground, border, glyph, and state indicator must remain visible against its actual background; passing Light and Dark themes is not evidence that High Contrast works.
 
 ### Accessibility
 - Set **`AutomationProperties.Name`** on icon-only controls (grid action buttons, tile icons, chart surfaces).
@@ -500,6 +516,9 @@ Enterprise and government LOB apps are frequently **held to accessibility and th
 ### Typography (use styles, never raw font properties)
 - `CaptionTextBlockStyle` 12 / `BodyTextBlockStyle` 14 / `BodyStrongTextBlockStyle` 14 SemiBold / `BodyLargeTextBlockStyle` 18 / `SubtitleTextBlockStyle` 20 / `TitleTextBlockStyle` 28 / `TitleLargeTextBlockStyle` 40.
 - Use **`SemiBold`, never `Bold`.** Minimum readable size **12px**. Sentence case. `TextTrimming="CharacterEllipsis"` for overflow.
+- Size icons as part of the same hierarchy instead of independently enlarging or shrinking them. Use WinUI control defaults where possible; for explicit `FontIcon` sizing, keep compact status/table glyphs subordinate to body text, standard command/navigation glyphs aligned with their control, and reserve large glyphs for empty states or feature illustrations.
+- Use `SymbolIcon`, `FontIcon`, or the icon support built into WinUI controls before importing custom icon assets. Check baseline alignment, optical weight, and spacing beside the corresponding text at every type-ramp level.
+- Don't use `Width`/`Height` to resize a `FontIcon`; use `FontSize`, and don't scale an icon merely to fill available space.
 
 ### Layout & scaling
 - **4px grid** — multiples of 4 for margins/padding/sizes; avoid 3/5/7/11/15 (blurry at fractional DPI).
@@ -507,6 +526,9 @@ Enterprise and government LOB apps are frequently **held to accessibility and th
 - Prefer **`MinHeight`/`MinWidth`** over fixed sizes so text scaling and localization don't clip.
 - **Flatten containers**: one `Grid` + per-child `Margin` beats nested `StackPanel`s with `Spacing`. Every container must earn its place.
 - Use `RowSpacing`/`ColumnSpacing`, not spacer elements.
+- Test compact window widths and portrait-like aspect ratios, not only desktop-wide landscape layouts. Reflow multi-column content, collapse secondary regions, and keep primary actions reachable.
+- Use `ScrollViewer` around the content region that needs to scroll, not around the whole shell by default. Set the content to stretch in the non-scrolling direction and avoid fixed-height intermediate containers that prevent text from extending the scrollable area.
+- At narrow widths, verify that wrapped text, validation messages, expanded rows, dropdowns, and dialogs remain fully reachable with mouse, touch, keyboard, and scroll bars.
 
 ---
 
@@ -546,19 +568,25 @@ public partial class OrdersViewModel : ObservableObject
 - Virtualization intact (no infinite-height parent), `x:Phase`/`x:Load` for heavy items?
 - **Filtering/sorting/grouping**: search + removable filter chips + result count + Clear all? Filtered-empty state distinct from no-data?
 - Numbers/dates right-aligned and culture-formatted consistently?
+- Table header alignment matches every cell in that column, including edit controls; centered headings have centered cells?
 - Empty / loading / error states present and bound to named VM properties?
 - Dashboard cards use `CardBackgroundFillColorDefaultBrush` + `ControlCornerRadius`, no fixed heights?
 - **Tasks**: status chips (glyph+label), grouping, multi-select + contextual bulk `CommandBar`, destructive actions confirmed?
 - Deltas/status not color-only; charts have accessible names + HC verified?
-- **Forms**: control `Header`s, validate on blur/submit (not per-keystroke), required-field marks, dirty-state Save/Cancel, `InfoBar` for errors, `IsEnabled` bound to VM?
+- **Forms**: control `Header`s, standard WinUI input/dropdown controls, validate on blur/submit (not per-keystroke), required-field marks, dirty-state Save/Cancel, `InfoBar` for errors, `IsEnabled` bound to VM?
 - All three theme variants defined; `ResourceKey`s end in `Brush`; HC uses only the 8 system brushes?
+- High Contrast checked for text, icons, borders, selection, focus, dropdown open states, and disabled/validation states?
 - Icon-only controls have `AutomationProperties.Name`?
-- Typography via styles; 4px grid; flattened containers?
+- Typography via WinUI styles; icon sizes support the same hierarchy; 4px grid; flattened containers?
+- Page/section edges align to a shared gutter; any edge-to-edge surface is intentional and keeps inner content inset?
+- Narrow and portrait-like windows reflow correctly; wrapped text and nested container content remain reachable through one clear scroll owner?
 
 ## Evidence for Visual Changes
 
 - Screenshots in **Light, Dark, and High Contrast**; hover/pressed for interactive items.
 - Test at **100/150/200/250%** scaling and with **long/localized** strings.
+- Capture the initial, narrow, and portrait-like window sizes. Include enough of the frame to verify shared content gutters, edge alignment, reflow, and scroll-bar ownership.
+- Exercise long wrapped text inside cards, table rows, expanders, dialogs, and other containers; confirm all content remains reachable without nested-scroll dead zones.
 - Verify **keyboard navigation, focus visuals, and screen-reader names** on grids and forms.
 - Verify **runtime theme switching** when resources/dictionaries change.
 - Run the smallest available build or targeted validation for implementation changes.
