@@ -1,5 +1,5 @@
 ---
-name: Windows LOB XAML Skill
+name: windows-lob-xaml
 description: "Design, build, and review data-dense line-of-business (LOB) apps in WinUI 3 / Windows App SDK: data grids and tables, dashboards and KPI cards, forms and validation, task/status tracking, filtering/sorting/grouping, and navigation shells — with usability, consistency, and enterprise compliance (theming, High Contrast, accessibility), favoring WinUI 3 APIs over WPF/UWP idioms. Triggers on: LOB app, data grid, ListView/GridView, WinUI.TableView, dashboard, KPI card, status chip, task tracking, bulk actions, form validation, master-detail, NavigationView, x:Bind/MVVM, virtualization, WPF/UWP-to-WinUI migration, WinUI XAML review."
 ---
 

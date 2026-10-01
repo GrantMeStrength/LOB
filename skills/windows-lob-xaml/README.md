@@ -9,7 +9,7 @@ tracking, filtering/sorting/grouping, navigation shells — and on enterprise
 compliance: theming, High Contrast, and accessibility. It also ensures WinUI 3
 / Windows App SDK APIs are used instead of WPF or UWP idioms.
 
-> Status: draft, created for the XAML design hackathon.
+> Status: public preview.
 
 ## What it does
 
