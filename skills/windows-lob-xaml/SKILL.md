@@ -73,7 +73,7 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 
 LOB apps live or die on **usability, clarity, and consistency**. These rules are cross-cutting: the *same* meaning must look and behave the *same* way across dashboards, tables, tasks, and forms. Reuse them — don't reinvent per screen.
 
-> **Archetype-calibrated defaults:** The spacing, shell, dashboard, task, and settings guidance below is informed by the Windows Design team's archetypal WinUI LOB sample. Treat its measurements as strong starting points, not universal constants: validate them against the app's content, density, localization, and minimum window size.
+> **Practical defaults, not unexplained constants:** The spacing, shell, dashboard, task, and settings measurements below are starting points chosen to preserve hierarchy, readable content, and predictable alignment in desktop LOB apps. Validate them against the app's density, localization, text scaling, and minimum window size. Derive responsive breakpoints from the minimum usable width of the content on each side of the layout, not from device labels.
 
 ### Discoverability first (the overarching rule)
 
@@ -299,7 +299,7 @@ Dashboards are **prioritized workflow surfaces**, not a single control or a wall
 
 Establish a deliberate **visual hierarchy**: give the most important business metric the strongest prominence, use charts/visualizations where they aid understanding, and lead the eye from summary toward detail. Avoid grids of visually identical cards and unexplained empty space — if everything looks equally important, nothing is.
 
-Archetypal dashboard structure:
+Good dashboard structure:
 
 - Open with useful context such as a page title or greeting and current date; do not spend prime space on decorative welcome content.
 - Use a prominent overview/hero only when it communicates current business state, target progress, and the work needing attention.
@@ -313,7 +313,7 @@ Archetypal dashboard structure:
 Use the layout primitive that matches the content:
 
 - **Uniform KPI cards:** `ItemsRepeater` + `UniformGridLayout`, `GridView`, or a small custom `Panel` can calculate the number of columns from a minimum item width. A custom panel is justified when the last row must stretch evenly or card heights must align by row.
-- **Heterogeneous widget pairs:** a `Grid` with **3:2** star columns works well for a primary insight beside a secondary work list. Stack the pair when either card becomes cramped; the archetypal sample switches near 920px, but choose the breakpoint from actual content.
+- **Heterogeneous widget pairs:** a `Grid` with **3:2** star columns works well for a primary insight beside a secondary work list. Stack the pair when either card becomes cramped. Calculate the breakpoint from the primary card's minimum readable width + the secondary card's minimum readable width + the column gap; do not copy a fixed window width without testing the actual content.
 - **Hero/metric pairs:** use `AdaptiveTrigger` or equivalent measured layout logic to move the metric below the narrative when the side-by-side composition no longer reads well.
 - Responsive behavior should **recompose hierarchy**, not merely shrink controls. Change columns to rows, allow linked chips to wrap, preserve readable text, and keep the primary workflow first.
 
@@ -536,7 +536,7 @@ For a daily-work task surface:
 ### Record detail surfaces
 
 - Start with a compact identity header: logo/avatar when useful, a clear Level 1 record name, and only the most important metadata.
-- Put a small set of summary metrics directly below the identity. Use subdued caption labels and prominent values; arrange three cards across when space permits and stack them when their content becomes cramped (the archetypal sample reflows near 720px).
+- Put a small set of summary metrics directly below the identity. Use subdued caption labels and prominent values; arrange three cards across only while each card retains enough width for its longest localized label and value. Otherwise reduce the column count or stack the cards. Derive the threshold from card minimum width and gaps rather than a fixed device breakpoint.
 - Follow metrics with short status/category/region chips, then narrative summary and structured account fields. This order moves from recognition to health to detail.
 - Decorative brand colors need Light, Dark, and explicit High Contrast resources. Keep record status semantically separate from brand color.
 
