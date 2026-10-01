@@ -73,13 +73,19 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 
 LOB apps live or die on **usability, clarity, and consistency**. These rules are cross-cutting: the *same* meaning must look and behave the *same* way across dashboards, tables, tasks, and forms. Reuse them — don't reinvent per screen.
 
+> **Practical defaults, not unexplained constants:** The spacing, shell, dashboard, task, and settings measurements below are starting points chosen to preserve hierarchy, readable content, and predictable alignment in desktop LOB apps. Validate them against the app's density, localization, text scaling, and minimum window size. Derive responsive breakpoints from the minimum usable width of the content on each side of the layout, not from device labels.
+
 ### Discoverability first (the overarching rule)
 
 > **A capability is not successful just because it exists — the user must be able to discover how to use it.** Every interaction needs a visible affordance: if a row reorders, show a grab handle; if a column sorts, make it look sortable; if data can be filtered, surface the control. Prefer a visible cue over a hidden gesture or "you just have to know."
 
+- Secondary row commands may stay visually quiet and reveal on pointer hover or keyboard focus, but reserve their layout space, provide a tooltip and automation name, and make the same action keyboard reachable. Do not make pointer hover the only way to discover or invoke an action.
+
 ### Coherent workflows, not loose widgets
 
 LOB apps are working applications, not collections of disconnected one-page tools. Combine related information and actions into one business workflow — e.g. create a customer *inside* the customer-management screen, fold task tracking into the dashboard — rather than shipping separate single-purpose pages that force the user to hop around.
+
+- Make summaries actionable. Dashboard cards, search results, related-record chips, and list summaries should deep-link to the relevant operational page or record rather than ending at a dead overview.
 
 ### One status vocabulary (reuse across every surface)
 
@@ -97,10 +103,10 @@ Pick one semantic system and use it everywhere a status appears (KPI tiles, tabl
 
 ### Command & action placement (be predictable)
 
-- **Primary page actions** → top `CommandBar` (WinUI 3 `CommandBar`, not shell command bar), left-aligned primary + overflow.
+- **Primary page actions** → put them at the start of the workflow they affect. Use a top `CommandBar` when a page has several peer commands; an inline accent button is often clearer for a focused entry card such as "New task."
 - **Per-row / per-item actions** → context menu (`MenuFlyout`) and/or hover-revealed buttons; keep the *same* action in the *same* place on every row.
 - **Bulk actions** → a contextual command bar that appears when selection > 0 (see Task Tracking).
-- **Destructive actions** (delete, discard) → always confirm via `ContentDialog`; label the button with the verb ("Delete 3 invoices"), never just "OK".
+- **Irreversible destructive actions** (permanent delete, discard, overwrite) → confirm via `ContentDialog`; label the button with the verb ("Delete 3 invoices"), never just "OK". A clearly reversible soft-delete may skip the modal when the item moves to a visible Deleted view and has a prominent Restore/Undo path.
 - Same action = same label, same glyph, same location, app-wide.
 
 ### Feedback & state consistency
@@ -119,6 +125,7 @@ Pick one semantic system and use it everywhere a status appears (KPI tiles, tabl
 ### Alignment & content bounds
 
 - Establish one page content gutter and align page titles, section headings, command surfaces, cards, forms, and tables to it. Misaligned left or right edges make dense LOB screens look accidental.
+- Start desktop LOB pages with a **24px outer gutter**, **16–24px between major sections**, and **12–24px between aligned form/row columns**. A shell that consumes a navigation rail may need an asymmetric leading inset (for example, 32px leading and 24px elsewhere). Adjust only for a demonstrated density or layout need.
 - **Edge-to-edge must be deliberate.** Selection backgrounds, data grids, and media can extend across their container when the design calls for it; text, forms, and card contents normally retain an inset. Look for missing `Padding`, unwanted `HorizontalAlignment="Stretch"`, and containers that erase the page gutter.
 - A list or table row can use a full-width hover/selection surface while its inner content stays aligned to the page or column inset.
 - Prefer shared container padding and grid columns over unrelated per-control margins. Check both edges of adjacent sections, not only the leading edge.
@@ -288,13 +295,29 @@ LOB users expect to filter the *same* table many ways at once. Back it with a **
 
 ## 2. Dashboards, Cards & Charts
 
-Dashboards are **composition patterns**, not a single control. Build them from a responsive card grid.
+Dashboards are **prioritized workflow surfaces**, not a single control or a wall of metrics. Compose them from responsive summary cards, operational lists, and a small number of larger insight widgets.
 
 Establish a deliberate **visual hierarchy**: give the most important business metric the strongest prominence, use charts/visualizations where they aid understanding, and lead the eye from summary toward detail. Avoid grids of visually identical cards and unexplained empty space — if everything looks equally important, nothing is.
 
-### Responsive card grid with ItemsRepeater
+Good dashboard structure:
 
-`ItemsRepeater` + `UniformGridLayout` gives dashboards that reflow columns by width without hardcoded breakpoints:
+- Open with useful context such as a page title or greeting and current date; do not spend prime space on decorative welcome content.
+- Use a prominent overview/hero only when it communicates current business state, target progress, and the work needing attention.
+- Keep compact KPI cards uniform, but vary the scale of larger widgets according to importance.
+- Limit priority lists to the few items that need attention now (for example, 3 tasks or 2 tickets per state), then provide a clear **View all** action.
+- Make every summary, list item, and related-record chip navigate to the corresponding workflow or record.
+- If dashboard personalization is valuable, expose widget visibility in Settings. When one widget in a pair is hidden, let the remaining widget expand instead of preserving a blank column.
+
+### Responsive dashboard composition
+
+Use the layout primitive that matches the content:
+
+- **Uniform KPI cards:** `ItemsRepeater` + `UniformGridLayout`, `GridView`, or a small custom `Panel` can calculate the number of columns from a minimum item width. A custom panel is justified when the last row must stretch evenly or card heights must align by row.
+- **Heterogeneous widget pairs:** a `Grid` with **3:2** star columns works well for a primary insight beside a secondary work list. Stack the pair when either card becomes cramped. Calculate the breakpoint from the primary card's minimum readable width + the secondary card's minimum readable width + the column gap; do not copy a fixed window width without testing the actual content.
+- **Hero/metric pairs:** use `AdaptiveTrigger` or equivalent measured layout logic to move the metric below the narrative when the side-by-side composition no longer reads well.
+- Responsive behavior should **recompose hierarchy**, not merely shrink controls. Change columns to rows, allow linked chips to wrap, preserve readable text, and keep the primary workflow first.
+
+`ItemsRepeater` + `UniformGridLayout` is a good default for uniform cards:
 
 ```xml
 xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
@@ -318,11 +341,8 @@ xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
 ### Metric / KPI card
 
 ```xml
-<Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-        BorderThickness="1"
-        CornerRadius="{StaticResource ControlCornerRadius}"
-        Padding="16">
+<Border Padding="20"
+        Style="{StaticResource CardStyle}">
     <Grid RowSpacing="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -347,7 +367,9 @@ xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
 
 Rules:
 - Card container is a **`Border`** (single child + background/stroke) — never a `Grid` just for a background.
-- Use **`CardBackgroundFillColorDefaultBrush`** + **`CardStrokeColorDefaultBrush`**, `ControlCornerRadius` (4px).
+- Use **`CardBackgroundFillColorDefaultBrush`** + **`CardStrokeColorDefaultBrush`** through a shared style, including a theme-aware border thickness.
+- Define a shared app-level card style. Use **20px padding** for standard dashboard/detail cards and **12px** for dense task/list rows; vary intentionally instead of giving every surface a one-off inset.
+- Use one consistent card-radius resource within a surface. `ControlCornerRadius` is the compact default; a shared 8px radius can distinguish large dashboard containers, but do not mix arbitrary per-card radii.
 - Group cards with **`SubtitleTextBlockStyle`** section headers.
 - Encode good/bad deltas as a **VM-provided brush/property**, not hardcoded green/red in XAML — and never rely on color alone (add a glyph/sign) for accessibility and High Contrast.
 - Don't fix card `Height`; use `MinItemHeight` + content, so text scaling and localization don't clip.
@@ -366,6 +388,14 @@ Whatever the choice: give the chart an **`AutomationProperties.Name`**, provide 
 ## 2.5 Task Tracking, Status & Bulk Actions
 
 Task/work-item tracking is a core LOB pattern left as pattern-only by the base system. Build it on a `ListView`/`WinUI.TableView` plus the shared **status vocabulary** from §0.5 — status must look identical here and on the dashboard.
+
+For a daily-work task surface:
+
+- Group task creation in a card: task title, due date, one accent **Add** action, concise helper text, and an inline `InfoBar` for validation or submission feedback.
+- Use `AutoSuggestBox` when task text can attach or mention related records. Render those references as wrapping inline chips that open the related record.
+- Use `SelectorBar` for a small set of mutually exclusive views such as **Open / Completed / Deleted**.
+- Offer workflow-oriented sorts, not only generic field order: manual, earliest/latest due date, related-record type first, or attachments first.
+- Give each view a specific empty state and announce updates with `AutomationProperties.LiveSetting="Polite"`.
 
 ### Status chips & badges
 
@@ -398,7 +428,9 @@ Task/work-item tracking is a core LOB pattern left as pattern-only by the base s
 - **Selection**: `SelectionMode="Multiple"`/`Extended`; support **Select all** and shift/ctrl selection.
 - **Bulk actions**: show a contextual `CommandBar` **only when selection > 0** ("3 selected · Complete · Assign · Delete"). Reuse the §0.5 placement rules; confirm destructive bulk actions in a `ContentDialog` with the count.
 - Provide an **empty-but-done** state ("All caught up") distinct from **no tasks** and from **filtered-to-none**.
-- **Reordering must be discoverable**: if tasks can be dragged to reorder, show a visible grab/reorder handle (a gripper affordance) and give pointer feedback during the drag — never rely on users guessing that rows are draggable.
+- **Reordering must be discoverable and keyboard operable**: use a dedicated grab/reorder handle with a move cursor, tooltip, automation name/help text, and Up/Down key support. It may reveal on row hover or handle focus to reduce visual noise, but its column/space must remain stable and pointer hover cannot be the only interaction.
+- Hide low-frequency delete/restore controls until row hover or keyboard focus only when they keep a stable position, have tooltips and automation names, and become visible when focused.
+- Prefer reversible deletion for lightweight task workflows: move the item to a **Deleted** view and provide Restore. Confirm permanent or bulk deletion.
 
 ---
 
@@ -406,7 +438,8 @@ Task/work-item tracking is a core LOB pattern left as pattern-only by the base s
 
 ### Layout
 
-- **One `Grid`, margins on children** — not nested `StackPanel`s with `Spacing`. Two columns: labels `Auto`, fields `*`, or stacked label-over-field for narrow widths.
+- Use **`Grid` for aligned rows and columns** and **`StackPanel` for genuine one-dimensional flow** such as page sections, labels above descriptions, or settings groups. Avoid gratuitous nesting, but do not replace a clear vertical sequence with a complex grid merely to eliminate `StackPanel`.
+- For aligned forms, use one `Grid` with `RowSpacing`/`ColumnSpacing`: two equal columns when wide, or stacked label-over-field at narrow widths.
 - **Stay usable as the window narrows**: reflow to a single stacked column and/or scroll — **don't split a simple form into tabs** just to save space. Choose scrolling vs. restructuring based on the actual content, not a fixed width.
 - Give the page or panel one clear vertical scroll owner. Avoid nesting a form `ScrollViewer` inside another scrolling container; nested scrolling commonly traps wheel, touch, and keyboard input.
 - When text sits inside a card, table cell, expander, dialog, or other container, verify `TextWrapping`, available height, and the container's scroll behavior together. Long text must wrap or remain reachable by scrolling instead of clipping behind a fixed-height parent.
@@ -450,7 +483,7 @@ Task/work-item tracking is a core LOB pattern left as pattern-only by the base s
 - **Validate by the kind of data** requested (email, phone, number, date), and show the error when the entered value is invalid. **Optional fields stay optional** — validate them only when the user actually supplies a value.
 - **Inline vs summary**: field-specific errors go **inline under the field**; cross-field/business-rule errors go in the top `InfoBar`.
 - **Dirty state**: track unsaved changes; enable **Save** only when dirty and valid; offer **Cancel/Discard**; warn on navigate-away with unsaved edits via `ContentDialog`.
-- **Destructive or irreversible actions** (delete, discard, overwrite) always confirm through a `ContentDialog` with a verb-labeled primary button.
+- **Destructive or irreversible actions** (permanent delete, discard, overwrite) confirm through a `ContentDialog` with a verb-labeled primary button. Reversible soft-delete can use immediate feedback plus Restore/Undo.
 - Keep forms **keyboard-first**: logical tab order, `Enter` submits single-purpose forms, `IsDefault`/`IsCancel` on dialog buttons.
 
 ---
@@ -458,9 +491,15 @@ Task/work-item tracking is a core LOB pattern left as pattern-only by the base s
 ## 4. App Shell & Navigation
 
 - **`NavigationView`** is the standard LOB app frame. Use `PaneDisplayMode="Auto"` so it collapses to a hamburger on narrow widths automatically. Use global navigation when the app genuinely has multiple related areas/workloads; don't add navigation just to make a single-purpose page look bigger.
+- For a multi-area desktop LOB app, consider an **integrated title-bar shell**:
+  - Extend content into a WinUI `TitleBar`, use Mica when appropriate, and put Back/Forward history plus global search in the non-drag region.
+  - Make global search span the app's primary record types, label result kinds, cap suggestions to a scannable set, and deep-link directly to the selected record.
+  - Give frequent shell actions standard shortcuts and tooltips, such as **Alt+Left/Alt+Right** for history and **Ctrl+E** for search.
+  - If the title bar owns the pane-toggle button, hide `NavigationView`'s duplicate toggle and route the title-bar request to `NavigationView.IsPaneOpen`.
+  - Keep Settings in the standard `NavigationView` settings destination and synchronize navigation selection when detail pages are opened from search or deep links.
 - **Master-detail**: use `CommunityToolkit`'s **`ListDetailsView`**, or a two-column `Grid` + `AdaptiveTrigger` that collapses to single-column navigation on narrow widths.
 - **Define sensible `MinWidth`/`MinHeight` and reflow so the layout doesn't break at its opening or narrowest size** — test at the width the app first launches, not only when maximized.
-- Responsive breakpoints via **`VisualStateManager` + `AdaptiveTrigger`** (compact < 640, medium 640–1007, wide ≥ 1008 are common LOB breakpoints):
+- Prefer responsive breakpoints via **`VisualStateManager` + `AdaptiveTrigger`**. Compact < 640, medium 640–1007, and wide ≥ 1008 are useful starting ranges, not requirements; choose the point where the real content stops working:
 
 ```xml
 <VisualStateManager.VisualStateGroups>
@@ -484,6 +523,22 @@ Task/work-item tracking is a core LOB pattern left as pattern-only by the base s
 ```
 
 - Remove `VisualState`s that have no triggers or setters.
+
+### Settings surfaces
+
+- Use a scrollable page with a **24px page gutter** and **24px between groups**.
+- Give each group a heading and a shared card container. Within a group, use rows around **72px minimum height**, 16px internal padding, and dividers inset to the row content.
+- Put the label and explanatory text on the left; align the `ToggleSwitch`, `ComboBox`, or command on the right. Reflow or stack the control when localization or a narrow window makes that relationship cramped.
+- Keep unavailable capabilities visible when they help users understand product state, but disable the control and explain why (for example, "No model available"). Do not present a silent disabled control.
+- Put app theme override, default workspace, notifications, and dashboard personalization here rather than scattering them through the shell.
+- Use a polite live `InfoBar` for settings actions that complete in place, such as reset or restore.
+
+### Record detail surfaces
+
+- Start with a compact identity header: logo/avatar when useful, a clear Level 1 record name, and only the most important metadata.
+- Put a small set of summary metrics directly below the identity. Use subdued caption labels and prominent values; arrange three cards across only while each card retains enough width for its longest localized label and value. Otherwise reduce the column count or stack the cards. Derive the threshold from card minimum width and gaps rather than a fixed device breakpoint.
+- Follow metrics with short status/category/region chips, then narrative summary and structured account fields. This order moves from recognition to health to detail.
+- Decorative brand colors need Light, Dark, and explicit High Contrast resources. Keep record status semantically separate from brand color.
 
 ---
 
@@ -509,6 +564,9 @@ Enterprise and government LOB apps are frequently **held to accessibility and th
 ### Accessibility
 - Set **`AutomationProperties.Name`** on icon-only controls (grid action buttons, tile icons, chart surfaces).
 - Never signal state with **color alone** — pair with text, glyph, or shape (critical for deltas, status chips, validation).
+- Set semantic `AutomationProperties.HeadingLevel` on page titles and section headings.
+- Use polite live regions for empty-state and successful in-place updates; reserve assertive announcements for errors that require immediate attention.
+- Add keyboard accelerators for frequent shell operations and expose them in tooltips. Custom reorder handles must be tab stops with keyboard instructions and key handling.
 - Test **Light, Dark, and High Contrast**; verify keyboard navigation, focus visuals, and screen-reader names on grids/forms.
 - **Check contrast in every interactive state**, not just the default — selection, hover, and filtered states can expose poor foreground/background pairings. **Don't assume an automated accessibility pass caught everything**; verify visually.
 - Dividers: `DividerStrokeColorDefaultBrush`. Light-dismiss targets must be hit-test visible (`Background="Transparent"`).
@@ -522,9 +580,10 @@ Enterprise and government LOB apps are frequently **held to accessibility and th
 
 ### Layout & scaling
 - **4px grid** — multiples of 4 for margins/padding/sizes; avoid 3/5/7/11/15 (blurry at fractional DPI).
-- `ControlCornerRadius` (4) for controls/cards; `OverlayCornerRadius` (8) for flyouts/dialogs. Never hardcode radius.
+- `ControlCornerRadius` (4) for controls and compact cards; `OverlayCornerRadius` (8) for flyouts/dialogs. Large dashboard cards may use a shared 8px card resource when the visual hierarchy calls for it. Do not hardcode different radii on individual elements.
 - Prefer **`MinHeight`/`MinWidth`** over fixed sizes so text scaling and localization don't clip.
 - **Flatten containers**: one `Grid` + per-child `Margin` beats nested `StackPanel`s with `Spacing`. Every container must earn its place.
+- Use `StackPanel` where the content is genuinely linear; "flatten containers" means remove wrappers that add no layout, state, clipping, or semantic value, not ban stack-based composition.
 - Use `RowSpacing`/`ColumnSpacing`, not spacer elements.
 - Test compact window widths and portrait-like aspect ratios, not only desktop-wide landscape layouts. Reflow multi-column content, collapse secondary regions, and keep primary actions reachable.
 - Use `ScrollViewer` around the content region that needs to scroll, not around the whole shell by default. Set the content to stretch in the non-scrolling direction and avoid fixed-height intermediate containers that prevent text from extending the scrollable area.
@@ -538,7 +597,7 @@ Enterprise and government LOB apps are frequently **held to accessibility and th
 - `DataTemplate` requires **`x:DataType`**.
 - Prefer **`x:Bind` functions** over `IValueConverter`; keep converters for simple type conversions only (bool→Visibility). Business logic belongs in the ViewModel.
 - Map UI state to **named VM properties** (bool/enum) — `HasItems`, `IsLoading`, `CanSubmit` — instead of stacking converters.
-- No styles/colors/layout in **code-behind** (exception: app-level `HighContrastAdjustment`).
+- Keep styles and colors in XAML resources. Prefer declarative visual states for fixed breakpoints, but presentation-only code-behind or a custom `Panel` is acceptable for layout that depends on runtime widget visibility, measured width, or last-row distribution. Keep business rules in the ViewModel and centralize/test the layout calculation instead of scattering pixel mutations through event handlers.
 - CommunityToolkit.Mvvm pattern:
 
 ```csharp
@@ -564,14 +623,16 @@ public partial class OrdersViewModel : ObservableObject
 - **Discoverable**: every capability (reorder handle, sortable header, filter control) has a visible affordance — nothing left to guesswork?
 - **No invented conventions**: where Windows guidance isn't established, flagged for design-system guidance rather than fabricated?
 - Right control for the data shape (ListView vs GridView vs WinUI.TableView vs ItemsRepeater)?
-- Item templates use `Grid` (not `StackPanel`) with `x:DataType` + `{x:Bind}`?
+- Item-template roots use `Grid` when columns, trimming, or alignment matter, with `x:DataType` + `{x:Bind}`? Linear subregions may use `StackPanel`.
 - Virtualization intact (no infinite-height parent), `x:Phase`/`x:Load` for heavy items?
 - **Filtering/sorting/grouping**: search + removable filter chips + result count + Clear all? Filtered-empty state distinct from no-data?
 - Numbers/dates right-aligned and culture-formatted consistently?
 - Table header alignment matches every cell in that column, including edit controls; centered headings have centered cells?
 - Empty / loading / error states present and bound to named VM properties?
-- Dashboard cards use `CardBackgroundFillColorDefaultBrush` + `ControlCornerRadius`, no fixed heights?
-- **Tasks**: status chips (glyph+label), grouping, multi-select + contextual bulk `CommandBar`, destructive actions confirmed?
+- Dashboard cards use a shared style with system card brushes, theme-aware borders, consistent radius/padding, and no fixed heights?
+- Dashboard is prioritized and actionable: limited attention lists, View all/deep links, heterogeneous widgets recompose at narrow widths, and hidden widgets do not leave gaps?
+- **Tasks**: status chips (glyph+label), grouping, multi-select + contextual bulk `CommandBar`, and irreversible destructive actions confirmed or reversible actions paired with Restore/Undo?
+- **Daily tasks**: status `SelectorBar`, workflow-relevant sorts, live empty states, related-record chips, keyboard-operable reordering, and reversible delete/restore where appropriate?
 - Deltas/status not color-only; charts have accessible names + HC verified?
 - **Forms**: control `Header`s, standard WinUI input/dropdown controls, validate on blur/submit (not per-keystroke), required-field marks, dirty-state Save/Cancel, `InfoBar` for errors, `IsEnabled` bound to VM?
 - All three theme variants defined; `ResourceKey`s end in `Brush`; HC uses only the 8 system brushes?
@@ -579,6 +640,9 @@ public partial class OrdersViewModel : ObservableObject
 - Icon-only controls have `AutomationProperties.Name`?
 - Typography via WinUI styles; icon sizes support the same hierarchy; 4px grid; flattened containers?
 - Page/section edges align to a shared gutter; any edge-to-edge surface is intentional and keeps inner content inset?
+- Multi-area shell integrates navigation history/global search without duplicate pane controls; search results identify record type and deep-link correctly?
+- Settings use grouped explanatory rows, right-aligned controls, visible reasons for disabled capabilities, and live confirmation for in-place actions?
+- Record details establish identity, summary metrics, semantic chips, and structured information in that order, with metric cards that stack before clipping?
 - Narrow and portrait-like windows reflow correctly; wrapped text and nested container content remain reachable through one clear scroll owner?
 
 ## Evidence for Visual Changes
