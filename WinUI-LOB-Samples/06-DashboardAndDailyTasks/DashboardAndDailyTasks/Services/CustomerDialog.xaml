@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+    x:Class="DashboardAndDailyTasks.Services.CustomerDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Add customer">
+
+    <ScrollViewer
+        MaxHeight="560"
+        HorizontalScrollBarVisibility="Disabled">
+        <StackPanel MinWidth="320" Spacing="12">
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="Create a customer profile for the sales and service teams."
+                TextWrapping="WrapWholeWords" />
+            <InfoBar
+                x:Name="ValidationInfoBar"
+                AutomationProperties.LiveSetting="Assertive"
+                IsClosable="False"
+                Severity="Error" />
+            <TextBox
+                x:Name="NameTextBox"
+                AutomationProperties.Name="Customer name, required"
+                Header="Name"
+                PlaceholderText="Ada Lovelace" />
+            <TextBox
+                x:Name="CompanyTextBox"
+                AutomationProperties.Name="Company, required"
+                Header="Company"
+                PlaceholderText="Organization" />
+            <TextBox
+                x:Name="EmailTextBox"
+                AutomationProperties.Name="Email, required"
+                Header="Email"
+                InputScope="EmailSmtpAddress"
+                PlaceholderText="ada@example.com" />
+            <TextBox
+                x:Name="PhoneTextBox"
+                AutomationProperties.Name="Phone, required"
+                Header="Phone"
+                InputScope="TelephoneNumber"
+                PlaceholderText="(555) 123-4567" />
+            <ComboBox
+                x:Name="RegionComboBox"
+                AutomationProperties.Name="Region, required"
+                HorizontalAlignment="Stretch"
+                Header="Region"
+                PlaceholderText="Choose a region">
+                <x:String>North</x:String>
+                <x:String>South</x:String>
+                <x:String>East</x:String>
+                <x:String>West</x:String>
+                <x:String>Central</x:String>
+            </ComboBox>
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                <Button Click="Cancel_Click" Content="Cancel" />
+                <Button
+                    AutomationProperties.AutomationId="SaveCustomerButton"
+                    Click="Save_Click"
+                    Content="Save customer"
+                    Style="{StaticResource AccentButtonStyle}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

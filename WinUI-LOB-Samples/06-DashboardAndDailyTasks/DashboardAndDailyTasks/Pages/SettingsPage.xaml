@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="DashboardAndDailyTasks.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Page.Resources>
+        <Style
+            x:Key="SettingsGroupStyle"
+            BasedOn="{StaticResource CardStyle}"
+            TargetType="Border">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style
+            x:Key="SettingsDescriptionStyle"
+            BasedOn="{StaticResource CaptionTextBlockStyle}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            <Setter Property="TextWrapping" Value="WrapWholeWords" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer HorizontalContentAlignment="Stretch">
+        <StackPanel
+            Padding="24"
+            HorizontalAlignment="Stretch"
+            Spacing="24">
+            <TextBlock
+                AutomationProperties.HeadingLevel="Level1"
+                Style="{StaticResource TitleTextBlockStyle}"
+                Text="Settings" />
+
+            <StackPanel Spacing="8">
+                <TextBlock
+                    AutomationProperties.HeadingLevel="Level2"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="Appearance" />
+                <Border Style="{StaticResource SettingsGroupStyle}">
+                    <Grid MinHeight="72" Padding="16" ColumnSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="App theme" />
+                            <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Choose how the app looks. Changes apply immediately." />
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="ThemeOptions"
+                            Grid.Column="1"
+                            MinWidth="200"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="App theme"
+                            SelectionChanged="ThemeOptions_SelectionChanged">
+                            <x:String>Use system setting</x:String>
+                            <x:String>Light</x:String>
+                            <x:String>Dark</x:String>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock
+                    AutomationProperties.HeadingLevel="Level2"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="AI" />
+                <Border Style="{StaticResource SettingsGroupStyle}">
+                    <Grid MinHeight="72" Padding="16" ColumnSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Ticket analysis model" />
+                            <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Compatible on-device models appear here when installed." />
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="AiModelPicker"
+                            Grid.Column="1"
+                            MinWidth="200"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="Ticket analysis model"
+                            IsEnabled="False"
+                            SelectedIndex="0">
+                            <x:String>No model available</x:String>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock
+                    AutomationProperties.HeadingLevel="Level2"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="Dashboard widgets" />
+                <Border Style="{StaticResource SettingsGroupStyle}">
+                    <StackPanel>
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon VerticalAlignment="Center" FontSize="16" Glyph="&#xE80F;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Revenue overview" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Monthly recurring revenue and target progress." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="RevenueOverviewToggle"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show revenue overview"
+                                Toggled="DashboardWidgetToggle_Toggled" />
+                        </Grid>
+                        <Rectangle Height="1" Margin="16,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon VerticalAlignment="Center" FontSize="16" Glyph="&#xE9D9;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Key metrics" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Customer, ticket, task, renewal, and response metrics." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="KpisToggle"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show key metrics"
+                                Toggled="DashboardWidgetToggle_Toggled" />
+                        </Grid>
+                        <Rectangle Height="1" Margin="16,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon VerticalAlignment="Center" FontSize="16" Glyph="&#xE9D2;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Ticket performance" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Weekly ticket closure trend." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="TicketPerformanceToggle"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show ticket performance"
+                                Toggled="DashboardWidgetToggle_Toggled" />
+                        </Grid>
+                        <Rectangle Height="1" Margin="16,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon VerticalAlignment="Center" FontSize="16" Glyph="&#xE73E;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Today's tasks" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Incomplete tasks due today." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="TodayTasksToggle"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show today's tasks"
+                                Toggled="DashboardWidgetToggle_Toggled" />
+                        </Grid>
+                        <Rectangle Height="1" Margin="16,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon VerticalAlignment="Center" FontSize="16" Glyph="&#xE716;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Customers" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Highest-value customer accounts." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="CustomersToggle"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show customers"
+                                Toggled="DashboardWidgetToggle_Toggled" />
+                        </Grid>
+                        <Rectangle Height="1" Margin="16,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon VerticalAlignment="Center" FontSize="16" Glyph="&#xE8BD;" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Open tickets" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Support tickets that still need attention." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="OpenTicketsToggle"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Show open tickets"
+                                Toggled="DashboardWidgetToggle_Toggled" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock
+                    AutomationProperties.HeadingLevel="Level2"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="Notifications and work preferences" />
+                <Border Style="{StaticResource SettingsGroupStyle}">
+                    <StackPanel>
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Daily summary notifications" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Receive a daily overview of work that needs attention." />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="NotificationToggle"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Daily summary notifications"
+                                Toggled="NotificationToggle_Toggled" />
+                        </Grid>
+                        <Rectangle Height="1" Margin="16,0" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                        <Grid MinHeight="72" Padding="16" ColumnSpacing="24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Default workspace" />
+                                <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="Choose the page shown when the app starts." />
+                            </StackPanel>
+                            <ComboBox
+                                x:Name="DefaultPagePicker"
+                                Grid.Column="1"
+                                MinWidth="200"
+                                VerticalAlignment="Center"
+                                AutomationProperties.Name="Default workspace"
+                                SelectionChanged="DefaultPagePicker_SelectionChanged">
+                                <ComboBoxItem Content="Dashboard" Tag="Dashboard" />
+                                <ComboBoxItem Content="Tickets" Tag="Tickets" />
+                                <ComboBoxItem Content="Tasks" Tag="Tasks" />
+                                <ComboBoxItem Content="Portfolio" Tag="Customers" />
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock
+                    AutomationProperties.HeadingLevel="Level2"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="About" />
+                <Border Style="{StaticResource SettingsGroupStyle}">
+                    <Grid MinHeight="80" Padding="16" ColumnSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Dashboard and daily tasks" />
+                            <TextBlock Style="{StaticResource SettingsDescriptionStyle}" Text="WinUI 3 line-of-business sample • Version 1.0" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Click="Reset_Click"
+                            Content="Reset sample data" />
+                    </Grid>
+                </Border>
+                <InfoBar
+                    x:Name="ResetConfirmation"
+                    AutomationProperties.LiveSetting="Polite"
+                    IsClosable="True"
+                    Message="Customers, tickets, and tasks were restored."
+                    Severity="Success"
+                    Title="Sample data reset" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

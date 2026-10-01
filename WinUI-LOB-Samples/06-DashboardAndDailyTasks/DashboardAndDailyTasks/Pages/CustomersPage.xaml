@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DashboardAndDailyTasks.Pages.CustomersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:DashboardAndDailyTasks.Models">
+
+    <Page.Resources>
+        <ResourceDictionary>
+        <ResourceDictionary.ThemeDictionaries>
+            <ResourceDictionary x:Key="Light">
+                <SolidColorBrush x:Key="CustomerLogo0Brush" Color="#005A9E" />
+                <SolidColorBrush x:Key="CustomerLogo1Brush" Color="#744DA9" />
+                <SolidColorBrush x:Key="CustomerLogo2Brush" Color="#0B6A0B" />
+                <SolidColorBrush x:Key="CustomerLogo3Brush" Color="#9D3A00" />
+                <SolidColorBrush x:Key="CustomerLogo4Brush" Color="#A4262C" />
+                <SolidColorBrush x:Key="CustomerLogo5Brush" Color="#006666" />
+                <SolidColorBrush x:Key="CustomerLogo6Brush" Color="#4F4F4F" />
+                <SolidColorBrush x:Key="CustomerLogo7Brush" Color="#6B4E00" />
+            </ResourceDictionary>
+            <ResourceDictionary x:Key="Dark">
+                <SolidColorBrush x:Key="CustomerLogo0Brush" Color="#75B6E7" />
+                <SolidColorBrush x:Key="CustomerLogo1Brush" Color="#C6A7EE" />
+                <SolidColorBrush x:Key="CustomerLogo2Brush" Color="#6CCB5F" />
+                <SolidColorBrush x:Key="CustomerLogo3Brush" Color="#F6A56B" />
+                <SolidColorBrush x:Key="CustomerLogo4Brush" Color="#F08A8E" />
+                <SolidColorBrush x:Key="CustomerLogo5Brush" Color="#65CFCF" />
+                <SolidColorBrush x:Key="CustomerLogo6Brush" Color="#D0D0D0" />
+                <SolidColorBrush x:Key="CustomerLogo7Brush" Color="#E7C56A" />
+            </ResourceDictionary>
+            <ResourceDictionary x:Key="HighContrast">
+                <StaticResource x:Key="CustomerLogo0Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo1Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo2Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo3Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo4Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo5Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo6Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                <StaticResource x:Key="CustomerLogo7Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+            </ResourceDictionary>
+        </ResourceDictionary.ThemeDictionaries>
+        <Style x:Key="PortfolioSurfaceStyle" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="{ThemeResource CardSurfaceBorderThickness}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        </Style>
+        <Style
+            x:Key="PortfolioLabelStyle"
+            BasedOn="{StaticResource CaptionTextBlockStyle}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Style>
+
+        <DataTemplate x:Key="LogoPixel0Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo0Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel1Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo1Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel2Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo2Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel3Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo3Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel4Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo4Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel5Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo5Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel6Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo6Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+        <DataTemplate x:Key="LogoPixel7Template" x:DataType="models:LogoPixel">
+            <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerLogo7Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="CustomerLogoTemplate" x:DataType="models:Customer">
+            <Grid Width="25" Height="25">
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel0Template}" Visibility="{x:Bind IsLogoVariant0, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel1Template}" Visibility="{x:Bind IsLogoVariant1, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel2Template}" Visibility="{x:Bind IsLogoVariant2, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel3Template}" Visibility="{x:Bind IsLogoVariant3, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel4Template}" Visibility="{x:Bind IsLogoVariant4, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel5Template}" Visibility="{x:Bind IsLogoVariant5, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel6Template}" Visibility="{x:Bind IsLogoVariant6, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource LogoPixel7Template}" Visibility="{x:Bind IsLogoVariant7, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CustomerCardTemplate" x:DataType="models:Customer">
+            <Border
+                MinHeight="208"
+                Padding="16"
+                AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"
+                Style="{StaticResource PortfolioSurfaceStyle}">
+                <Grid RowSpacing="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Width="44"
+                            Height="44"
+                            AutomationProperties.AccessibilityView="Raw"
+                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <ContentControl
+                                Width="28"
+                                Height="28"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="{x:Bind}"
+                                ContentTemplate="{StaticResource CustomerLogoTemplate}"
+                                IsTabStop="False" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind Company, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="{x:Bind Industry, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <Border
+                            Grid.Column="2"
+                            Padding="8,4"
+                            VerticalAlignment="Top"
+                            Background="{ThemeResource SystemFillColorAttentionBackgroundBrush}"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Status, Mode=OneWay}" />
+                        </Border>
+                    </Grid>
+                    <StackPanel Grid.Row="1" Spacing="4">
+                        <TextBlock Style="{StaticResource PortfolioLabelStyle}" Text="ACCOUNT VALUE" />
+                        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind AccountValue, Mode=OneWay}" />
+                    </StackPanel>
+                    <Grid Grid.Row="2" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource PortfolioLabelStyle}" Text="OWNER" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind Owner, Mode=OneWay}"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="4">
+                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource PortfolioLabelStyle}" Text="NEXT RENEWAL" />
+                            <TextBlock HorizontalAlignment="Right" Text="{x:Bind RenewalDateDisplay, Mode=OneWay}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CustomerRowTemplate" x:DataType="models:Customer">
+            <Grid
+                MinHeight="56"
+                Padding="12,8"
+                AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"
+                ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.2*" />
+                    <ColumnDefinition Width="1.6*" />
+                    <ColumnDefinition Width="1.3*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1.2*" />
+                    <ColumnDefinition Width="1.2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="36"
+                        Height="36"
+                        AutomationProperties.AccessibilityView="Raw"
+                        Background="{ThemeResource ControlFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource ControlCornerRadius}">
+                        <ContentControl
+                            Width="24"
+                            Height="24"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{x:Bind}"
+                            ContentTemplate="{StaticResource CustomerLogoTemplate}"
+                            IsTabStop="False" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Company, Mode=OneWay}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Industry, Mode=OneWay}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Grid>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{x:Bind Name, Mode=OneWay}" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{x:Bind Owner, Mode=OneWay}" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{x:Bind Region, Mode=OneWay}" TextAlignment="Center" />
+                <Border
+                    Grid.Column="4"
+                    Padding="8,4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{ThemeResource SystemFillColorAttentionBackgroundBrush}"
+                    CornerRadius="{StaticResource ControlCornerRadius}">
+                    <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Status, Mode=OneWay}" />
+                </Border>
+                <TextBlock Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{x:Bind RenewalDateDisplay, Mode=OneWay}" TextAlignment="Center" />
+                <TextBlock Grid.Column="6" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind LastActivity, Mode=OneWay}" TextAlignment="Center" />
+                <TextBlock Grid.Column="7" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind AccountValue, Mode=OneWay}" TextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="CustomerHeaderGrid" ColumnSpacing="16" RowSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock AutomationProperties.HeadingLevel="Level1" Style="{StaticResource TitleTextBlockStyle}" Text="Portfolio" />
+            <Button
+                x:Name="NewCustomerButton"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                AutomationProperties.AutomationId="NewCustomerButton"
+                Click="AddCustomer_Click"
+                Content="New customer"
+                Style="{StaticResource AccentButtonStyle}" />
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup>
+                    <VisualState x:Name="WideHeader">
+                        <VisualState.StateTriggers>
+                            <AdaptiveTrigger MinWindowWidth="640" />
+                        </VisualState.StateTriggers>
+                    </VisualState>
+                    <VisualState x:Name="NarrowHeader">
+                        <VisualState.StateTriggers>
+                            <AdaptiveTrigger MinWindowWidth="0" />
+                        </VisualState.StateTriggers>
+                        <VisualState.Setters>
+                            <Setter Target="NewCustomerButton.(Grid.Column)" Value="0" />
+                            <Setter Target="NewCustomerButton.(Grid.Row)" Value="1" />
+                            <Setter Target="NewCustomerButton.HorizontalAlignment" Value="Left" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </Grid>
+
+        <Border Grid.Row="1" Padding="20" Style="{StaticResource PortfolioSurfaceStyle}">
+            <Grid x:Name="MetricsGrid" ColumnSpacing="24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="MetricColumn0" Width="*" />
+                    <ColumnDefinition x:Name="MetricColumn1" Width="*" />
+                    <ColumnDefinition x:Name="MetricColumn2" Width="*" />
+                    <ColumnDefinition x:Name="MetricColumn3" Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition x:Name="MetricRow1" Height="0" />
+                </Grid.RowDefinitions>
+                <StackPanel x:Name="TotalPortfolioMetric" Spacing="4">
+                    <TextBlock Style="{StaticResource PortfolioLabelStyle}" Text="TOTAL PORTFOLIO" />
+                    <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind ViewModel.TotalPortfolioValue, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel x:Name="AccountsMetric" Grid.Column="1" Spacing="4">
+                    <TextBlock Style="{StaticResource PortfolioLabelStyle}" Text="ACCOUNTS" />
+                    <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind ViewModel.TotalCustomerCount, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel
+                    x:Name="ActiveMetric"
+                    Grid.Column="2"
+                    Spacing="4">
+                    <TextBlock Style="{StaticResource PortfolioLabelStyle}" Text="ACTIVE" />
+                    <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind ViewModel.ActiveAccountCount, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel
+                    x:Name="RiskMetric"
+                    Grid.Column="3"
+                    Spacing="4">
+                    <TextBlock Style="{StaticResource PortfolioLabelStyle}" Text="NEEDS ATTENTION" />
+                    <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind ViewModel.AtRiskAccountCount, Mode=OneWay}" />
+                </StackPanel>
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState x:Name="WideMetrics">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="760" />
+                            </VisualState.StateTriggers>
+                        </VisualState>
+                        <VisualState x:Name="NarrowMetrics">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter Target="MetricColumn2.Width" Value="0" />
+                                <Setter Target="MetricColumn3.Width" Value="0" />
+                                <Setter Target="MetricRow1.Height" Value="Auto" />
+                                <Setter Target="MetricsGrid.RowSpacing" Value="16" />
+                                <Setter Target="ActiveMetric.(Grid.Column)" Value="0" />
+                                <Setter Target="ActiveMetric.(Grid.Row)" Value="1" />
+                                <Setter Target="RiskMetric.(Grid.Column)" Value="1" />
+                                <Setter Target="RiskMetric.(Grid.Row)" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Padding="20" Style="{StaticResource PortfolioSurfaceStyle}">
+            <Grid x:Name="FilterGrid" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="SearchColumn" Width="*" />
+                    <ColumnDefinition x:Name="StatusColumn" Width="Auto" />
+                    <ColumnDefinition x:Name="RegionColumn" Width="Auto" />
+                    <ColumnDefinition x:Name="RenewalColumn" Width="Auto" />
+                    <ColumnDefinition x:Name="SortColumn" Width="Auto" />
+                    <ColumnDefinition x:Name="ResetColumn" Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBox
+                    x:Name="SearchBox"
+                    MinWidth="240"
+                    AutomationProperties.Name="Search customer accounts"
+                    PlaceholderText="Search customers, companies, owners, or industries"
+                    TextChanged="SearchBox_TextChanged" />
+                <DropDownButton
+                    x:Name="StatusFilter"
+                    Grid.Column="1"
+                    MinWidth="144"
+                    AutomationProperties.Name="Filter by account status"
+                    Content="{x:Bind ViewModel.StatusFilterLabel, Mode=OneWay}"
+                    HorizontalContentAlignment="Left">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="StatusFilterMenu">
+                            <ToggleMenuFlyoutItem Click="StatusFilterItem_Click" Tag="Active" Text="Active" />
+                            <ToggleMenuFlyoutItem Click="StatusFilterItem_Click" Tag="Prospect" Text="Prospect" />
+                            <ToggleMenuFlyoutItem Click="StatusFilterItem_Click" Tag="Pending" Text="Pending" />
+                            <ToggleMenuFlyoutItem Click="StatusFilterItem_Click" Tag="At risk" Text="At risk" />
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+                <DropDownButton
+                    x:Name="RegionFilter"
+                    Grid.Column="2"
+                    MinWidth="132"
+                    AutomationProperties.Name="Filter by region"
+                    Content="{x:Bind ViewModel.RegionFilterLabel, Mode=OneWay}"
+                    HorizontalContentAlignment="Left">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="RegionFilterMenu">
+                            <ToggleMenuFlyoutItem Click="RegionFilterItem_Click" Tag="North" Text="North" />
+                            <ToggleMenuFlyoutItem Click="RegionFilterItem_Click" Tag="South" Text="South" />
+                            <ToggleMenuFlyoutItem Click="RegionFilterItem_Click" Tag="East" Text="East" />
+                            <ToggleMenuFlyoutItem Click="RegionFilterItem_Click" Tag="West" Text="West" />
+                            <ToggleMenuFlyoutItem Click="RegionFilterItem_Click" Tag="Central" Text="Central" />
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+                <ComboBox
+                    x:Name="RenewalFilter"
+                    Grid.Column="3"
+                    MinWidth="168"
+                    AutomationProperties.Name="Filter by renewal date"
+                    ItemsSource="{x:Bind ViewModel.RenewalFilterOptions, Mode=OneTime}"
+                    SelectedItem="{x:Bind ViewModel.SelectedRenewalFilter, Mode=TwoWay}" />
+                <ComboBox
+                    x:Name="SortComboBox"
+                    Grid.Column="4"
+                    MinWidth="216"
+                    AutomationProperties.Name="Sort customer accounts"
+                    ItemsSource="{x:Bind ViewModel.SortOptions, Mode=OneTime}"
+                    SelectionChanged="SortComboBox_SelectionChanged"
+                    SelectedItem="{x:Bind ViewModel.SelectedSort, Mode=TwoWay}" />
+                <Button
+                    x:Name="ResetFiltersButton"
+                    Grid.Column="5"
+                    AutomationProperties.Name="Reset customer filters"
+                    Click="ResetFilters_Click"
+                    Content="Reset" />
+                <TextBlock
+                    x:Name="ResultSummaryText"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="6"
+                    Margin="4,8,0,0"
+                    AutomationProperties.LiveSetting="Polite"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{x:Bind ViewModel.ResultSummary, Mode=OneWay}" />
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState x:Name="WideFilters">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="1180" />
+                            </VisualState.StateTriggers>
+                        </VisualState>
+                        <VisualState x:Name="NarrowFilters">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter Target="StatusColumn.Width" Value="0" />
+                                <Setter Target="RegionColumn.Width" Value="0" />
+                                <Setter Target="RenewalColumn.Width" Value="0" />
+                                <Setter Target="SortColumn.Width" Value="0" />
+                                <Setter Target="ResetColumn.Width" Value="0" />
+                                <Setter Target="StatusFilter.(Grid.Column)" Value="0" />
+                                <Setter Target="StatusFilter.(Grid.Row)" Value="1" />
+                                <Setter Target="StatusFilter.HorizontalAlignment" Value="Stretch" />
+                                <Setter Target="RegionFilter.(Grid.Column)" Value="0" />
+                                <Setter Target="RegionFilter.(Grid.Row)" Value="2" />
+                                <Setter Target="RegionFilter.HorizontalAlignment" Value="Stretch" />
+                                <Setter Target="RenewalFilter.(Grid.Column)" Value="0" />
+                                <Setter Target="RenewalFilter.(Grid.Row)" Value="3" />
+                                <Setter Target="RenewalFilter.HorizontalAlignment" Value="Stretch" />
+                                <Setter Target="SortComboBox.(Grid.Column)" Value="0" />
+                                <Setter Target="SortComboBox.(Grid.Row)" Value="4" />
+                                <Setter Target="SortComboBox.HorizontalAlignment" Value="Stretch" />
+                                <Setter Target="ResetFiltersButton.(Grid.Column)" Value="0" />
+                                <Setter Target="ResetFiltersButton.(Grid.Row)" Value="5" />
+                                <Setter Target="ResetFiltersButton.HorizontalAlignment" Value="Stretch" />
+                                <Setter Target="ResultSummaryText.(Grid.Row)" Value="6" />
+                                <Setter Target="FilterGrid.RowSpacing" Value="8" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="3" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <SelectorBar x:Name="ViewSelector" AutomationProperties.Name="Customer view" SelectionChanged="ViewSelector_SelectionChanged">
+                <SelectorBarItem x:Name="TableSelectorItem" Text="Table" />
+                <SelectorBarItem x:Name="CardsSelectorItem" Text="Cards" />
+            </SelectorBar>
+            <Grid Grid.Row="1">
+                <Border x:Name="TableView" Style="{StaticResource PortfolioSurfaceStyle}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Disabled">
+                        <Grid MinWidth="1120">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Padding="12,8" Background="{ThemeResource SubtleFillColorSecondaryBrush}" ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2.2*" />
+                                    <ColumnDefinition Width="1.6*" />
+                                    <ColumnDefinition Width="1.3*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="1.2*" />
+                                    <ColumnDefinition Width="1.2*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="CompanySortButton" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Company">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Company" />
+                                        <FontIcon x:Name="CompanySortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70E;" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="ContactSortButton" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Contact">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Contact" />
+                                        <FontIcon x:Name="ContactSortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70E;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="OwnerSortButton" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Owner">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Owner" />
+                                        <FontIcon x:Name="OwnerSortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70E;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="RegionSortButton" Grid.Column="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Region">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Region" />
+                                        <FontIcon x:Name="RegionSortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70E;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="StatusSortButton" Grid.Column="4" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Status">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Status" />
+                                        <FontIcon x:Name="StatusSortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70E;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="RenewalSortButton" Grid.Column="5" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Renewal">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Renewal" />
+                                        <FontIcon x:Name="RenewalSortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70E;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="ActivitySortButton" Grid.Column="6" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Activity">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Last activity" />
+                                        <FontIcon x:Name="ActivitySortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70D;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                                <Button x:Name="ValueSortButton" Grid.Column="7" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Click="TableHeader_Click" Style="{StaticResource SubtleButtonStyle}" Tag="Value">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource BodyStrongTextBlockStyle}" Text="Value" />
+                                        <FontIcon x:Name="ValueSortIcon" HorizontalAlignment="Right" FontSize="12" Glyph="&#xE70D;" Visibility="Collapsed" />
+                                    </Grid>
+                                </Button>
+                            </Grid>
+                            <ListView
+                                x:Name="CustomerTable"
+                                Grid.Row="1"
+                                AutomationProperties.AutomationId="CustomerTableListView"
+                                AutomationProperties.Name="Customer account table"
+                                IsItemClickEnabled="True"
+                                ItemClick="CustomerTable_ItemClick"
+                                ItemTemplate="{StaticResource CustomerRowTemplate}"
+                                ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
+                                SelectionMode="None" />
+                        </Grid>
+                    </ScrollViewer>
+                </Border>
+                <ListView
+                    x:Name="CardsView"
+                    Padding="12,12,0,0"
+                    AutomationProperties.AutomationId="CustomerCardsView"
+                    AutomationProperties.Name="Customer account cards"
+                    IsItemClickEnabled="True"
+                    ItemClick="CustomerCards_ItemClick"
+                    ItemTemplate="{StaticResource CustomerCardTemplate}"
+                    ItemsSource="{x:Bind ViewModel.Customers, Mode=OneWay}"
+                    SelectionMode="None"
+                    Visibility="Collapsed">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Margin" Value="0,0,12,12" />
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid
+                                ItemHeight="208"
+                                ItemWidth="300"
+                                MaximumRowsOrColumns="5"
+                                Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

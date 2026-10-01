@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TimerAndTasks (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TimerAndTasks (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

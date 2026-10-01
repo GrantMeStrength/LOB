@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="DashboardAndDailyTasks.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:DashboardAndDailyTasks.Models"
+    Title="Dashboard and daily tasks">
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+    <Grid x:Name="RootGrid">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <ResourceDictionary.ThemeDictionaries>
+                    <ResourceDictionary x:Key="Light" />
+                    <ResourceDictionary x:Key="Dark" />
+                    <ResourceDictionary x:Key="HighContrast">
+                        <StaticResource x:Key="NavigationViewItemForeground" ResourceKey="SystemColorButtonTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundPointerOver" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundPressed" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundChecked" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundCheckedPointerOver" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundCheckedPressed" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundSelected" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundSelectedPointerOver" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemForegroundSelectedPressed" ResourceKey="SystemColorHighlightTextColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackground" ResourceKey="SystemColorWindowColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundPointerOver" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundPressed" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundChecked" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundCheckedPointerOver" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundCheckedPressed" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundSelected" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundSelectedPointerOver" ResourceKey="SystemColorHighlightColorBrush" />
+                        <StaticResource x:Key="NavigationViewItemBackgroundSelectedPressed" ResourceKey="SystemColorHighlightColorBrush" />
+                    </ResourceDictionary>
+                </ResourceDictionary.ThemeDictionaries>
+            </ResourceDictionary>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TitleBar
+            x:Name="AppTitleBar"
+            Title="Dashboard and daily tasks"
+            IsPaneToggleButtonVisible="True"
+            PaneToggleRequested="TitleBar_PaneToggleRequested">
+            <TitleBar.IconSource>
+                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
+            </TitleBar.IconSource>
+            <TitleBar.Content>
+                <Grid
+                    x:Name="TitleBarContent"
+                    ColumnSpacing="4"
+                    SizeChanged="TitleBarContent_SizeChanged">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Margin="0,0,8,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                        <Button
+                            x:Name="BackButton"
+                            AutomationProperties.Name="Go back"
+                            Click="BackButton_Click"
+                            IsEnabled="False"
+                            ToolTipService.ToolTip="Back (Alt+Left)">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="Left" Modifiers="Menu" />
+                            </Button.KeyboardAccelerators>
+                            <FontIcon FontSize="16" Glyph="&#xE76B;" />
+                        </Button>
+                        <Button
+                            x:Name="ForwardButton"
+                            AutomationProperties.Name="Go forward"
+                            Click="ForwardButton_Click"
+                            IsEnabled="False"
+                            ToolTipService.ToolTip="Forward (Alt+Right)">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="Right" Modifiers="Menu" />
+                            </Button.KeyboardAccelerators>
+                            <FontIcon FontSize="16" Glyph="&#xE76C;" />
+                        </Button>
+                    </StackPanel>
+                    <AutoSuggestBox
+                        x:Name="GlobalSearchBox"
+                        Grid.Column="1"
+                        Width="760"
+                        MinWidth="240"
+                        MaxWidth="760"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Search customers, tickets, and tasks"
+                        PlaceholderText="Search"
+                        QueryIcon="Find"
+                        QuerySubmitted="GlobalSearch_QuerySubmitted"
+                        SuggestionChosen="GlobalSearch_SuggestionChosen"
+                        TextChanged="GlobalSearch_TextChanged"
+                        UpdateTextOnSelect="False">
+                        <AutoSuggestBox.KeyboardAccelerators>
+                            <KeyboardAccelerator
+                                Key="E"
+                                Invoked="SearchAccelerator_Invoked"
+                                Modifiers="Control" />
+                        </AutoSuggestBox.KeyboardAccelerators>
+                        <AutoSuggestBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:ShellSearchResult">
+                                <Grid
+                                    MinWidth="360"
+                                    Padding="8,4"
+                                    ColumnSpacing="12"
+                                    Tag="{x:Bind}"
+                                    Tapped="GlobalSearchSuggestion_Tapped">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="32" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        Glyph="{x:Bind Glyph, Mode=OneTime}" />
+                                    <StackPanel Grid.Column="1" Spacing="2">
+                                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Title, Mode=OneTime}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind Subtitle, Mode=OneTime}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="{x:Bind Kind, Mode=OneTime}" />
+                                </Grid>
+                            </DataTemplate>
+                        </AutoSuggestBox.ItemTemplate>
+                    </AutoSuggestBox>
+                </Grid>
+            </TitleBar.Content>
+        </TitleBar>
+        <NavigationView
+            x:Name="NavView"
+            Grid.Row="1"
+            AutomationProperties.Name="Primary navigation"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            IsSettingsVisible="True"
+            ItemInvoked="NavView_ItemInvoked"
+            SelectionChanged="NavView_SelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    AutomationProperties.AutomationId="NavDashboard"
+                    Content="Dashboard"
+                    IsSelected="True"
+                    Tag="Dashboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE80F;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
+                    AutomationProperties.AutomationId="NavTickets"
+                    Content="Tickets"
+                    Tag="Tickets">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Tag" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
+                    AutomationProperties.AutomationId="NavTasks"
+                    Content="Tasks"
+                    Tag="Tasks">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Accept" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
+                    AutomationProperties.AutomationId="NavCustomers"
+                    Content="Portfolio"
+                    Tag="Customers">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE716;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+            <Frame x:Name="ContentFrame" Navigated="ContentFrame_Navigated">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <NavigationThemeTransition />
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
+        </NavigationView>
+    </Grid>
+</Window>

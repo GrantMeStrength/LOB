@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DashboardAndDailyTasks.Pages.CustomerDetailsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:DashboardAndDailyTasks.Models">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="CustomerDetailLogo0Brush" Color="#005A9E" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo1Brush" Color="#744DA9" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo2Brush" Color="#0B6A0B" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo3Brush" Color="#9D3A00" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo4Brush" Color="#A4262C" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo5Brush" Color="#006666" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo6Brush" Color="#4F4F4F" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo7Brush" Color="#6B4E00" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="CustomerDetailLogo0Brush" Color="#75B6E7" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo1Brush" Color="#C6A7EE" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo2Brush" Color="#6CCB5F" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo3Brush" Color="#F6A56B" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo4Brush" Color="#F08A8E" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo5Brush" Color="#65CFCF" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo6Brush" Color="#D0D0D0" />
+                    <SolidColorBrush x:Key="CustomerDetailLogo7Brush" Color="#E7C56A" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    <StaticResource x:Key="CustomerDetailLogo0Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo1Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo2Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo3Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo4Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo5Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo6Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                    <StaticResource x:Key="CustomerDetailLogo7Brush" ResourceKey="SystemColorWindowTextColorBrush" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+            <Style x:Key="DetailSurfaceStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="{ThemeResource CardSurfaceBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+            </Style>
+            <Style
+                x:Key="DetailLabelStyle"
+                BasedOn="{StaticResource CaptionTextBlockStyle}"
+                TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Style>
+            <DataTemplate x:Key="DetailLogoPixel0Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo0Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel1Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo1Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel2Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo2Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel3Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo3Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel4Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo4Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel5Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo5Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel6Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo6Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DetailLogoPixel7Template" x:DataType="models:LogoPixel">
+                <Rectangle Width="4" Height="4" Margin="0.5" Fill="{ThemeResource CustomerDetailLogo7Brush}" Opacity="{x:Bind Opacity, Mode=OneTime}" />
+            </DataTemplate>
+            <DataTemplate x:Key="CustomerDetailLogoTemplate" x:DataType="models:Customer">
+                <Grid Width="25" Height="25">
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel0Template}" Visibility="{x:Bind IsLogoVariant0, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel1Template}" Visibility="{x:Bind IsLogoVariant1, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel2Template}" Visibility="{x:Bind IsLogoVariant2, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel3Template}" Visibility="{x:Bind IsLogoVariant3, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel4Template}" Visibility="{x:Bind IsLogoVariant4, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel5Template}" Visibility="{x:Bind IsLogoVariant5, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel6Template}" Visibility="{x:Bind IsLogoVariant6, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl ItemsSource="{x:Bind LogoPixels, Mode=OneTime}" ItemTemplate="{StaticResource DetailLogoPixel7Template}" Visibility="{x:Bind IsLogoVariant7, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid ItemWidth="5" ItemHeight="5" MaximumRowsOrColumns="5" Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="20">
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border
+                    Width="56"
+                    Height="56"
+                    VerticalAlignment="Center"
+                    AutomationProperties.AccessibilityView="Raw"
+                    Background="{ThemeResource ControlFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource ControlCornerRadius}">
+                    <TextBlock
+                        x:Name="CompanyLogo"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource TitleTextBlockStyle}" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock
+                        x:Name="CompanyText"
+                        AutomationProperties.HeadingLevel="Level1"
+                        Style="{StaticResource TitleLargeTextBlockStyle}"
+                        TextWrapping="WrapWholeWords" />
+                </StackPanel>
+            </Grid>
+
+            <Grid x:Name="DetailMetricsGrid" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="DetailMetricColumn0" Width="*" />
+                    <ColumnDefinition x:Name="DetailMetricColumn1" Width="*" />
+                    <ColumnDefinition x:Name="DetailMetricColumn2" Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border x:Name="ValueCard" Padding="20" Style="{StaticResource DetailSurfaceStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource DetailLabelStyle}" Text="ACCOUNT VALUE" />
+                        <TextBlock x:Name="ValueText" Style="{StaticResource TitleTextBlockStyle}" />
+                    </StackPanel>
+                </Border>
+                <Border x:Name="RenewalCard" Grid.Column="1" Padding="20" Style="{StaticResource DetailSurfaceStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource DetailLabelStyle}" Text="NEXT RENEWAL" />
+                        <TextBlock x:Name="RenewalText" Style="{StaticResource TitleTextBlockStyle}" />
+                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" Text="Contract renewal date" />
+                    </StackPanel>
+                </Border>
+                <Border x:Name="ActivityCard" Grid.Column="2" Padding="20" Style="{StaticResource DetailSurfaceStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource DetailLabelStyle}" Text="LAST ACTIVITY" />
+                        <TextBlock x:Name="ActivityText" Style="{StaticResource TitleTextBlockStyle}" />
+                        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" Text="Customer engagement" />
+                    </StackPanel>
+                </Border>
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState x:Name="WideMetrics">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="720" />
+                            </VisualState.StateTriggers>
+                        </VisualState>
+                        <VisualState x:Name="NarrowMetrics">
+                            <VisualState.StateTriggers>
+                                <AdaptiveTrigger MinWindowWidth="0" />
+                            </VisualState.StateTriggers>
+                            <VisualState.Setters>
+                                <Setter Target="DetailMetricColumn1.Width" Value="0" />
+                                <Setter Target="DetailMetricColumn2.Width" Value="0" />
+                                <Setter Target="DetailMetricsGrid.RowSpacing" Value="12" />
+                                <Setter Target="RenewalCard.(Grid.Column)" Value="0" />
+                                <Setter Target="RenewalCard.(Grid.Row)" Value="1" />
+                                <Setter Target="ActivityCard.(Grid.Column)" Value="0" />
+                                <Setter Target="ActivityCard.(Grid.Row)" Value="2" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+            </Grid>
+
+            <Border Padding="20" Style="{StaticResource DetailSurfaceStyle}">
+                <StackPanel Spacing="20">
+                    <TextBlock AutomationProperties.HeadingLevel="Level2" Style="{StaticResource SubtitleTextBlockStyle}" Text="Account overview" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border
+                            Padding="8,4"
+                            Background="{ThemeResource SystemFillColorAttentionBackgroundBrush}"
+                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <TextBlock x:Name="StatusText" Style="{StaticResource CaptionTextBlockStyle}" />
+                        </Border>
+                        <Border
+                            Padding="8,4"
+                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <TextBlock x:Name="IndustryText" Style="{StaticResource CaptionTextBlockStyle}" />
+                        </Border>
+                        <Border
+                            Padding="8,4"
+                            Background="{ThemeResource ControlFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <TextBlock x:Name="RegionText" Style="{StaticResource CaptionTextBlockStyle}" />
+                        </Border>
+                    </StackPanel>
+                    <TextBlock x:Name="SummaryText" TextWrapping="WrapWholeWords" />
+                    <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                    <Grid ColumnSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource DetailLabelStyle}" Text="PRIMARY CONTACT" />
+                            <TextBlock x:Name="ContactText" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock x:Name="ContactDetailsText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="4">
+                            <TextBlock Style="{StaticResource DetailLabelStyle}" Text="ACCOUNT OWNER" />
+                            <TextBlock x:Name="OwnerText" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
