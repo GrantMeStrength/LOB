@@ -67,7 +67,7 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 
 > **Review mode:** treat any `System.Windows.*` / `Windows.UI.Xaml.*` reference, `Style.Triggers`/`DataTrigger`, `DynamicResource`, `Visibility="Hidden"`, `MessageBox`, or `Dispatcher.Invoke` as a platform-correctness issue, not a style nit.
 
-### Experimental in-box controls (coming — don't ship production code on them yet)
+### Experimental in-box controls
 
 Several controls that LOB apps have long needed in-box are now previewing natively in WinUI 3, but **only in the _experimental_ channel of the Windows App SDK** (currently `2.5.4-experimental`). These are showcased in [WinUI Gallery 3.0](https://devblogs.microsoft.com/ifdef-windows/winui-gallery-3-0-is-here-tableview-charts-inkcanvas-and-more/), which now targets that experimental channel so you can try them as soon as they ship:
 
