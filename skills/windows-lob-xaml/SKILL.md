@@ -67,6 +67,17 @@ For unreadable visuals, malformed XAML, or missing resources, name the blocker i
 
 > **Review mode:** treat any `System.Windows.*` / `Windows.UI.Xaml.*` reference, `Style.Triggers`/`DataTrigger`, `DynamicResource`, `Visibility="Hidden"`, `MessageBox`, or `Dispatcher.Invoke` as a platform-correctness issue, not a style nit.
 
+### Experimental in-box controls
+
+Several controls that LOB apps have long needed in-box are now previewing natively in WinUI 3, but **only in the _experimental_ channel of the Windows App SDK** (currently `2.5.4-experimental`). These are showcased in [WinUI Gallery 3.0](https://devblogs.microsoft.com/ifdef-windows/winui-gallery-3-0-is-here-tableview-charts-inkcanvas-and-more/), which now targets that experimental channel so you can try them as soon as they ship:
+
+- **`TableView`** — native editable, sortable, resizable multi-column table (the in-box answer to the §1 table gap).
+- **`Microsoft.UI.Xaml.Controls.Charts`** — native line/bar charts with legends, axes, and live `ObservableCollection` updates (the in-box answer to the §2 charts gap).
+- **`InkCanvas` / `InkToolbar`** — native inking (pen/touch/mouse), replacing the unavailable WPF `InkCanvas` noted above.
+- **`WrapPanel`**, **`LayoutPanel`**, **`PagerControl`**, and new top-level **`Window`** sizing APIs (`Width`/`Height`/`MinWidth`/`MinHeight`/`MaxWidth`/`MaxHeight`).
+
+> ⚠️ **Real shipping risk.** Experimental APIs can change or be removed in any later release, and the experimental Windows App SDK is **not** supported for production. **Do not ship these to customers yet.** For apps shipping now, keep using the stable recommendations in this skill (`WinUI.TableView` for editable tables, a charting dependency for charts). Treat the experimental controls as "evaluate and give feedback," and plan to migrate to them once they reach a stable Windows App SDK release.
+
 ---
 
 ## 0.5 Consistency & Clarity Doctrine (apply everywhere)
@@ -150,6 +161,8 @@ The most common LOB surface. Pick the right control first — this is the decisi
 > **"Table" is a design pattern, not a control.** Do not hand-roll a table out of nested `Grid`s and `StackPanel`s for real tabular data — use a table control (editable) or `ListView` with a `Grid`-based `DataTemplate` (read-only).
 
 > ⚠️ **Don't use the Community Toolkit `DataGrid` for new WinUI 3 apps.** It was archived and did **not** move to Windows Community Toolkit v8 (survives only in unmaintained 7.x for UWP/Uno). Use **`WinUI.TableView`** (maintained, DataGrid-like, built for WinUI 3) or the earlier-stage CommunityToolkit Labs `DataTable`. Verify the package against its docs before shipping.
+
+> 🧪 **Heads-up:** a native in-box **`TableView`** is now previewing in the _experimental_ Windows App SDK (see §0, [WinUI Gallery 3.0](https://devblogs.microsoft.com/ifdef-windows/winui-gallery-3-0-is-here-tableview-charts-inkcanvas-and-more/)). It's not production-ready — keep the community **`WinUI.TableView`** for apps shipping today and migrate when it reaches a stable release.
 
 ### ListView / GridView essentials
 
@@ -376,10 +389,12 @@ Rules:
 
 ### Charts
 
-There is **no in-box WinUI chart control.** State this and pick a dependency:
+There is **no in-box WinUI chart control** in the stable Windows App SDK. State this and pick a dependency:
 - **CommunityToolkit** (sparklines / simple visualizations) for lightweight needs.
 - **LiveCharts2**, **ScottPlot**, or **Syncfusion/Telerik** for full charting.
 - For a few bars, a bound `ItemsRepeater` of `Rectangle`/`Border` heights is legitimate and dependency-free.
+
+> 🧪 **Heads-up:** a native **`Microsoft.UI.Xaml.Controls.Charts`** is now previewing in the _experimental_ Windows App SDK (see §0, [WinUI Gallery 3.0](https://devblogs.microsoft.com/ifdef-windows/winui-gallery-3-0-is-here-tableview-charts-inkcanvas-and-more/)). It's not production-ready — keep a charting dependency for apps shipping today and migrate when it reaches a stable release.
 
 Whatever the choice: give the chart an **`AutomationProperties.Name`**, provide a **data-table fallback** or accessible summary, and verify it renders in **High Contrast** (many third-party charts hardcode colors).
 
